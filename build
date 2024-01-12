@@ -1,0 +1,7 @@
+#!/bin/sh -e
+
+cd linuxdoom-1.10/
+make clean
+clear
+make
+cd ../

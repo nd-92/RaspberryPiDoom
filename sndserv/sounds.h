@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // $Id: sounds.h,v 1.3 1997/01/29 22:40:44 b1 Exp $
@@ -114,7 +114,6 @@ typedef enum
     mus_dm2int,
     NUMMUSIC
 } musicenum_t;
-
 
 //
 // Identifiers for all sfx in game.
@@ -235,7 +234,6 @@ typedef enum
 } sfxenum_t;
 
 extern musicinfo_t S_music[];
-extern sfxinfo_t   S_sfx[];
+extern sfxinfo_t S_sfx[];
 
 #endif
-
