@@ -56,6 +56,8 @@
         "rho_0": "OpenFOAM",
         "p_0": "OpenFOAM",
         "delta": "OpenFOAM",
-        "dstrings.C": "cpp"
+        "dstrings.C": "cpp",
+        "i_system.C": "cpp",
+        "p_inter.C": "cpp"
     }
 }

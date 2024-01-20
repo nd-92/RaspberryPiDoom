@@ -44,15 +44,15 @@ static const char
 #endif
 #include "i_system.H"
 
-int mb_used = 6;
+const size_t mb_used = 6;
 
-void I_Tactile(int on,
-               int off,
-               int total)
-{
-    // UNUSED.
-    on = off = total = 0;
-}
+// void I_Tactile(int on,
+//                int off,
+//                int total)
+// void I_Tactile(int total)
+// {
+//     total = 0;
+// }
 
 ticcmd_t emptycmd;
 ticcmd_t *I_BaseTiccmd(void)
@@ -65,10 +65,10 @@ int I_GetHeapSize(void)
     return mb_used * 1024 * 1024;
 }
 
-byte *I_ZoneBase(int *size)
+byte *I_ZoneBase(size_t *size)
 {
     *size = mb_used * 1024 * 1024;
-    return (byte *)malloc(*size);
+    return static_cast<byte *>(malloc(*size));
 }
 
 //
@@ -111,7 +111,7 @@ void I_Quit(void)
     exit(0);
 }
 
-void I_WaitVBL(int count)
+void I_WaitVBL(const useconds_t count)
 {
 #ifdef SGI
     sginap(1);
@@ -132,11 +132,11 @@ void I_EndRead(void)
 {
 }
 
-byte *I_AllocLow(int length)
+byte *I_AllocLow(const size_t length)
 {
-    byte *mem;
+    // byte *mem;
 
-    mem = (byte *)malloc(length);
+    byte *mem = static_cast<byte *>(malloc(length));
     memset(mem, 0, length);
     return mem;
 }

@@ -821,7 +821,13 @@ void P_DamageMobj(mobj_t *target,
 		temp = damage < 100 ? damage : 100;
 
 		if (player == &players[consoleplayer])
-			I_Tactile(40, 10, 40 + temp * 2);
+		// I_Tactile(40, 10, 40 + temp * 2);
+		// {
+		// 	I_Tactile(40 + temp * 2);
+		// }
+		// {
+		// 	temp = 0;
+		// }
 	}
 
 	// do the damage
