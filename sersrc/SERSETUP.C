@@ -1,9 +1,9 @@
 // sersetup.c
 #define DOOM2
-#include "sersetup.h"
-// #include "serstr.h"
-#include "ser_frch.h" // FRENCH VERSION
-#include "DoomNet.h"
+#include "sersetup.H"
+// #include "serstr.H"
+#include "ser_frch.H" // FRENCH VERSION
+#include "DoomNet.H"
 
 extern que_t inque, outque;
 

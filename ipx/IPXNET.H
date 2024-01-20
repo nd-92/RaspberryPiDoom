@@ -5,7 +5,7 @@ typedef struct
      char private[512];
 } doomdata_t;
 
-#include "DoomNet.h"
+#include "DoomNet.H"
 
 //===========================================================================
 

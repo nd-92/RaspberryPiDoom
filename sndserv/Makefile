@@ -44,5 +44,5 @@ $(O)/sndserver: \
 	echo make complete.
 
 # Rule
-$(O)/%.o: %.c
+$(O)/%.o: %.C
 	$(CC) $(CFLAGS) -c $< -o $@

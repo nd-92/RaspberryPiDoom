@@ -8,17 +8,16 @@
 
 # CFLAGS = -g -Wall -Wextra -Wpedantic -DNORMALUNIX -DLINUX # -DUSEASM 
 
-# CXX = g++
-# CXXSTANDARD = -std=c++14
-CXX = gcc
-# CXXSTANDARD = -std=c11
+CXX = g++
+CXXSTANDARD = -std=c++11
 OPTFLAGS = -O3 -flto
 MFLAGS = -mcpu=native
 WFLAGS = -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wformat-security -Winline -Wformat=2 -Wattributes \
 -Wbuiltin-macro-redefined -Wcast-align -Wdiv-by-zero -Wdouble-promotion -Wfloat-equal -Wint-to-pointer-cast -Wlogical-op -Woverflow \
 -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-promo -Wwrite-strings -Wimplicit-fallthrough=5 -Wstringop-overflow=4 -Wstrict-aliasing=3
 EXTRA_CXXFLAGS = -DNORMALUNIX -DLINUX
-LDFLAGS = -L/usr/X11R6/lib
+# LDFLAGS = -L/usr/X11R6/lib
+LDFLAGS = -L/usr/lib/X11/
 LIBS = -lXext -lX11 -lnsl -lm
 CXXFLAGS = $(CXXSTANDARD) $(OPTFLAGS) $(MFLAGS) $(PFLAGS) $(WFLAGS) $(EXTRA_CXXFLAGS) $(INCLUDE)
 
@@ -91,19 +90,22 @@ OBJS =						\
 
 all:	 $(O)/linuxxdoom
 
+# default:
+# 	$(CXX) $(CXXFLAGS) *.C -o linuxxdoom
+
 clean:
 	rm -f *.o *~ *.flc
 	rm -f linux/*
-	rm -rf $(HOME)/DOOM/*
+	rm -rf $(HOME)/DOOM/linux/
 
 $(O)/linuxxdoom:	$(OBJS) $(O)/i_main.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJS) $(O)/i_main.o \
-	-o $(O)/linuxxdoom $(LIBS)
+	$(LIBS) -o $(O)/linuxxdoom
 
 install:
 	cp -r linux/ $(HOME)/DOOM/
 
-$(O)/%.o:	%.c
+$(O)/%.o:	%.C
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 #############################################################

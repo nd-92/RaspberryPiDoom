@@ -7,9 +7,9 @@
 #include <conio.h>
 #include <dos.h>
 
-#include "doomnet.h"
-// #include "ipxstr.h"
-#include "ipx_frch.h" // FRENCH VERSION
+#include "doomnet.H"
+// #include "ipxstr.H"
+#include "ipx_frch.H" // FRENCH VERSION
 
 doomcom_t doomcom;
 int vectorishooked;

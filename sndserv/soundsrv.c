@@ -48,9 +48,9 @@ static const char rcsid[] = "$Id: soundsrv.c,v 1.3 1997/01/29 22:40:44 b1 Exp $"
 #include <sys/stat.h>
 #include <sys/time.h>
 
-#include "sounds.h"
-#include "soundsrv.h"
-#include "wadread.h"
+#include "sounds.H"
+#include "soundsrv.H"
+#include "wadread.H"
 
 //
 // Department of Redundancy Department.

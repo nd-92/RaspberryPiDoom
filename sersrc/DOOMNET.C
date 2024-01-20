@@ -4,10 +4,10 @@
 #include <string.h>
 #include <process.h>
 #include <dos.h>
-#include "doomnet.h"
+#include "doomnet.H"
 
-// #include "serstr.h"
-#include "ser_frch.h" // FRENCH VERSION
+// #include "serstr.H"
+#include "ser_frch.H" // FRENCH VERSION
 
 #define DOOM2
 

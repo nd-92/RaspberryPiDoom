@@ -42,7 +42,7 @@ enum
     true
 };
 
-#include "sounds.h"
+#include "sounds.H"
 
 //
 // Information about all the music

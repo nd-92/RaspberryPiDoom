@@ -11,9 +11,9 @@
 #include <stdarg.h>
 #include <bios.h>
 
-#include "ipxnet.h"
-// #include "ipxstr.h"
-#include "ipx_frch.h" // FRENCH VERSION
+#include "ipxnet.H"
+// #include "ipxstr.H"
+#include "ipx_frch.H" // FRENCH VERSION
 
 int gameid;
 int numnetnodes;
