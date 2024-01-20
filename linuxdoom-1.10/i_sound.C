@@ -65,7 +65,7 @@ static const char
 #ifdef SNDSERV
 // Separate sound server process.
 FILE *sndserver = 0;
-char *sndserver_filename = "./sndserver ";
+const char *sndserver_filename = "./sndserver ";
 #elif SNDINTR
 
 // Update all 30 millisecs, approx. 30fps synchronized.
@@ -142,17 +142,20 @@ int channelids[NUM_CHANNELS];
 int steptable[256];
 
 // Volume lookups.
-int vol_lookup[128 * 256];
+// int vol_lookup[128 * 256];
+signed short vol_lookup[128 * 256];
 
 // Hardware left and right channel volume lookup.
-int *channelleftvol_lookup[NUM_CHANNELS];
-int *channelrightvol_lookup[NUM_CHANNELS];
+// int *channelleftvol_lookup[NUM_CHANNELS];
+// int *channelrightvol_lookup[NUM_CHANNELS];
+signed short *channelleftvol_lookup[NUM_CHANNELS];
+signed short *channelrightvol_lookup[NUM_CHANNELS];
 
 //
 // Safe ioctl, convenience.
 //
 void myioctl(int fd,
-             int command,
+             long unsigned int command,
              int *arg)
 {
   int rc;
@@ -161,7 +164,7 @@ void myioctl(int fd,
   rc = ioctl(fd, command, arg);
   if (rc < 0)
   {
-    fprintf(stderr, "ioctl(dsp,%d,arg) failed\n", command);
+    fprintf(stderr, "ioctl(dsp,%lu,arg) failed\n", command);
     fprintf(stderr, "errno=%d\n", errno);
     exit(-1);
   }
@@ -173,13 +176,13 @@ void myioctl(int fd,
 //
 void *
 getsfx(char *sfxname,
-       int *len)
+       size_t *len)
 {
   unsigned char *sfx;
   unsigned char *paddedsfx;
-  int i;
-  int size;
-  int paddedsize;
+  size_t i;
+  size_t size;
+  size_t paddedsize;
   char name[20];
   int sfxlump;
 
@@ -198,9 +201,13 @@ getsfx(char *sfxname,
   //  variable. Instead, we will use a
   //  default sound for replacement.
   if (W_CheckNumForName(name) == -1)
+  {
     sfxlump = W_GetNumForName("dspistol");
+  }
   else
+  {
     sfxlump = W_GetNumForName(name);
+  }
 
   size = W_LumpLength(sfxlump);
 
@@ -246,7 +253,7 @@ getsfx(char *sfxname,
 //
 int addsfx(int sfxid,
            int volume,
-           int step,
+           unsigned int step,
            int seperation)
 {
   static unsigned short handlenums = 0;
@@ -369,8 +376,8 @@ void I_SetChannels()
   // Init internal lookups (raw data, mixing buffer, channels).
   // This function sets up internal lookups used during
   //  the mixing process.
-  int i;
-  int j;
+  // signed short i;
+  // signed short j;
 
   int *steptablemid = steptable + 128;
 
@@ -382,15 +389,21 @@ void I_SetChannels()
 
   // This table provides step widths for pitch parameters.
   // I fail to see that this is currently used.
-  for (i = -128; i < 128; i++)
+  for (int i = -128; i < 128; i++)
+  {
     steptablemid[i] = (int)(pow(2.0, (i / 64.0)) * 65536.0);
+  }
 
   // Generates volume lookup tables
   //  which also turn the unsigned samples
   //  into signed samples.
-  for (i = 0; i < 128; i++)
-    for (j = 0; j < 256; j++)
-      vol_lookup[i * 256 + j] = (i * (j - 128) * 256) / 127;
+  for (signed short i = 0; i < 128; i++)
+  {
+    for (signed short j = 0; j < 256; j++)
+    {
+      vol_lookup[i * 256 + j] = static_cast<signed short>((static_cast<double>(i) * (static_cast<double>(j) - 128) * 256) / 127);
+    }
+  }
 }
 
 void I_SetSfxVolume(int volume)
@@ -438,12 +451,11 @@ int I_GetSfxLumpNum(sfxinfo_t *sfx)
 int I_StartSound(int id,
                  int vol,
                  int sep,
-                 int pitch,
-                 int priority)
+                 int pitch)
 {
 
   // UNUSED
-  priority = 0;
+  // priority = 0;
 
 #ifdef SNDSERV
   if (sndserver)
@@ -466,7 +478,7 @@ int I_StartSound(int id,
 #endif
 }
 
-void I_StopSound(int handle)
+void I_StopSound()
 {
   // You need the handle returned by StartSound.
   // Would be looping all channels,
@@ -474,7 +486,7 @@ void I_StopSound(int handle)
   //  an setting the channel to zero.
 
   // UNUSED.
-  handle = 0;
+  // handle = 0;
 }
 
 int I_SoundIsPlaying(int handle)
@@ -505,9 +517,9 @@ void I_UpdateSound(void)
 
   // Mix current sound data.
   // Data, from raw sound, for right and left.
-  register unsigned int sample;
-  register int dl;
-  register int dr;
+  unsigned int sample;
+  signed short dl;
+  signed short dr;
 
   // Pointers in global mixbuffer, left, right, end.
   signed short *leftout;
@@ -573,20 +585,20 @@ void I_UpdateSound(void)
     // else if (dl < -128) *leftout = -128;
     // else *leftout = dl;
 
-    if (dl > 0x7fff)
-      *leftout = 0x7fff;
-    else if (dl < -0x8000)
-      *leftout = -0x8000;
-    else
-      *leftout = dl;
+    // if (dl > 0x7fff)
+    //   *leftout = 0x7fff;
+    // else if (dl < -0x8000)
+    //   *leftout = -0x8000;
+    // else
+    *leftout = dl;
 
     // Same for right hardware channel.
-    if (dr > 0x7fff)
-      *rightout = 0x7fff;
-    else if (dr < -0x8000)
-      *rightout = -0x8000;
-    else
-      *rightout = dr;
+    // if (dr > 0x7fff)
+    //   *rightout = 0x7fff;
+    // else if (dr < -0x8000)
+    //   *rightout = -0x8000;
+    // else
+    *rightout = dr;
 
     // Increment current pointers in mixbuffer.
     leftout += step;
@@ -626,10 +638,7 @@ void I_SubmitSound(void)
   write(audio_fd, mixbuffer, SAMPLECOUNT * BUFMUL);
 }
 
-void I_UpdateSoundParams(int handle,
-                         int vol,
-                         int sep,
-                         int pitch)
+void I_UpdateSoundParams()
 {
   // I fail too see that this is used.
   // Would be using the handle to identify
@@ -637,7 +646,7 @@ void I_UpdateSoundParams(int handle,
   //  and resetting the channel parameters.
 
   // UNUSED.
-  handle = vol = sep = pitch = 0;
+  // handle = vol = sep = pitch = 0;
 }
 
 void I_ShutdownSound(void)
@@ -774,57 +783,58 @@ void I_InitSound()
 void I_InitMusic(void) {}
 void I_ShutdownMusic(void) {}
 
-static int looping = 0;
+static int looping_ = 0;
 static int musicdies = -1;
 
-void I_PlaySong(int handle, int looping)
+void I_PlaySong()
 {
   // UNUSED.
-  handle = looping = 0;
-  musicdies = gametic + TICRATE * 30;
+  // handle = looping = 0;
+  // musicdies = gametic + TICRATE * 30;
+  // looping = 0;
 }
 
-void I_PauseSong(int handle)
+void I_PauseSong()
 {
   // UNUSED.
-  handle = 0;
+  // handle = 0;
 }
 
-void I_ResumeSong(int handle)
+void I_ResumeSong()
 {
   // UNUSED.
-  handle = 0;
+  // handle = 0;
 }
 
-void I_StopSong(int handle)
+void I_StopSong()
 {
   // UNUSED.
-  handle = 0;
+  // handle = 0;
 
-  looping = 0;
+  looping_ = 0;
   musicdies = 0;
 }
 
-void I_UnRegisterSong(int handle)
+void I_UnRegisterSong()
 {
   // UNUSED.
-  handle = 0;
+  // handle = 0;
 }
 
-int I_RegisterSong(void *data)
+int I_RegisterSong()
 {
   // UNUSED.
-  data = NULL;
+  // data = NULL;
 
   return 1;
 }
 
 // Is the song playing?
-int I_QrySongPlaying(int handle)
+int I_QrySongPlaying()
 {
   // UNUSED.
-  handle = 0;
-  return looping || musicdies > gametic;
+  // handle = 0;
+  return looping_ || musicdies > gametic;
 }
 
 //
@@ -850,7 +860,7 @@ static int /*__itimer_which*/ itimer = ITIMER_REAL;
 static int sig = SIGALRM;
 
 // Interrupt handler.
-void I_HandleSoundTimer(int ignore)
+void I_HandleSoundTimer(__attribute__((unused)) const int ignore)
 {
   // Debug.
   // fprintf( stderr, "%c", '+' ); fflush( stderr );
@@ -869,7 +879,7 @@ void I_HandleSoundTimer(int ignore)
     return;
 
   // UNUSED, but required.
-  ignore = 0;
+  // ignore = 0;
   return;
 }
 

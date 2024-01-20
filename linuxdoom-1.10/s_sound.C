@@ -613,7 +613,7 @@ void S_ChangeMusic(int musicnum,
     music->handle = I_RegisterSong(music->data);
 
     // play it
-    I_PlaySong(music->handle, looping);
+    I_PlaySong(looping);
 
     mus_playing = music;
 }

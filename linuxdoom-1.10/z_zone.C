@@ -169,7 +169,7 @@ void Z_Free(void *ptr)
 #define MINFRAGMENT 64
 
 void *
-Z_Malloc(int size,
+Z_Malloc(size_t size,
          int tag,
          void *user)
 {

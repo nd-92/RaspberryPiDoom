@@ -58,6 +58,10 @@
         "delta": "OpenFOAM",
         "dstrings.C": "cpp",
         "i_system.C": "cpp",
-        "p_inter.C": "cpp"
+        "p_inter.C": "cpp",
+        "i_sound.C": "cpp",
+        "w_wad.C": "cpp",
+        "z_zone.C": "cpp",
+        "s_sound.C": "cpp"
     }
 }

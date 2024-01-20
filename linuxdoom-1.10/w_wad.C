@@ -322,7 +322,7 @@ int W_NumLumps(void)
 // Returns -1 if name not found.
 //
 
-int W_CheckNumForName(char *name)
+int W_CheckNumForName(const char *name)
 {
     union
     {
@@ -366,7 +366,7 @@ int W_CheckNumForName(char *name)
 // W_GetNumForName
 // Calls W_CheckNumForName, but bombs out if not found.
 //
-int W_GetNumForName(char *name)
+int W_GetNumForName(const char *name)
 {
     int i;
 
@@ -382,7 +382,7 @@ int W_GetNumForName(char *name)
 // W_LumpLength
 // Returns the buffer size needed to load the given lump.
 //
-int W_LumpLength(int lump)
+size_t W_LumpLength(int lump)
 {
     if (lump >= numlumps)
         I_Error("W_LumpLength: %i >= numlumps", lump);
