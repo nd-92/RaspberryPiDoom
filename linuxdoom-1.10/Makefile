@@ -9,10 +9,10 @@
 # CFLAGS = -g -Wall -Wextra -Wpedantic -DNORMALUNIX -DLINUX # -DUSEASM 
 
 CXX = g++
-CXXSTANDARD = -std=c++11
+CXXSTANDARD = -std=c++20
 OPTFLAGS = -O3 -flto
 MFLAGS = -mcpu=native
-WFLAGS = -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wformat-security -Winline -Wformat=2 -Wattributes \
+WFLAGS = -Werror -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wformat-security -Winline -Wformat=2 -Wattributes \
 -Wbuiltin-macro-redefined -Wcast-align -Wdiv-by-zero -Wdouble-promotion -Wfloat-equal -Wint-to-pointer-cast -Wlogical-op -Woverflow \
 -Wpointer-arith -Wredundant-decls -Wshadow -Wsign-promo -Wwrite-strings -Wimplicit-fallthrough=5 -Wstringop-overflow=4 -Wstrict-aliasing=3
 EXTRA_CXXFLAGS = -DNORMALUNIX -DLINUX
