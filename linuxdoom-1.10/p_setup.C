@@ -22,8 +22,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-    rcsid[] = "$Id: p_setup.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
+static const char rcsid[] = "$Id: p_setup.c,v 1.5 1997/02/03 22:45:12 b1 Exp $";
 
 #include <math.h>
 
@@ -175,9 +174,13 @@ void P_LoadSegs(int lump)
         li->sidedef = &sides[ldef->sidenum[side]];
         li->frontsector = sides[ldef->sidenum[side]].sector;
         if (ldef->flags & ML_TWOSIDED)
+        {
             li->backsector = sides[ldef->sidenum[side ^ 1]].sector;
+        }
         else
+        {
             li->backsector = 0;
+        }
     }
 
     Z_Free(data);
@@ -271,7 +274,9 @@ void P_LoadNodes(int lump)
         {
             no->children[j] = SHORT(mn->children[j]);
             for (k = 0; k < 4; k++)
+            {
                 no->bbox[j][k] = SHORT(mn->bbox[j][k]) << FRACBITS;
+            }
         }
     }
 
@@ -363,15 +368,23 @@ void P_LoadLineDefs(int lump)
         ld->dy = v2->y - v1->y;
 
         if (!ld->dx)
+        {
             ld->slopetype = ST_VERTICAL;
+        }
         else if (!ld->dy)
+        {
             ld->slopetype = ST_HORIZONTAL;
+        }
         else
         {
             if (FixedDiv(ld->dy, ld->dx) > 0)
+            {
                 ld->slopetype = ST_POSITIVE;
+            }
             else
+            {
                 ld->slopetype = ST_NEGATIVE;
+            }
         }
 
         if (v1->x < v2->x)
@@ -400,14 +413,22 @@ void P_LoadLineDefs(int lump)
         ld->sidenum[1] = SHORT(mld->sidenum[1]);
 
         if (ld->sidenum[0] != -1)
+        {
             ld->frontsector = sides[ld->sidenum[0]].sector;
+        }
         else
+        {
             ld->frontsector = 0;
+        }
 
         if (ld->sidenum[1] != -1)
+        {
             ld->backsector = sides[ld->sidenum[1]].sector;
+        }
         else
+        {
             ld->backsector = 0;
+        }
     }
 
     Z_Free(data);
@@ -456,7 +477,9 @@ void P_LoadBlockMap(int lump)
     count = W_LumpLength(lump) / 2;
 
     for (i = 0; i < count; i++)
+    {
         blockmaplump[i] = SHORT(blockmaplump[i]);
+    }
 
     bmaporgx = blockmaplump[0] << FRACBITS;
     bmaporgy = blockmaplump[1] << FRACBITS;
@@ -528,7 +551,9 @@ void P_GroupLines(void)
             }
         }
         if (linebuffer - sector->lines != sector->linecount)
+        {
             I_Error("P_GroupLines: miscounted");
+        }
 
         // set the degenmobj_t to the middle of the bounding box
         sector->soundorg.x = (bbox[BOXRIGHT] + bbox[BOXLEFT]) / 2;
@@ -556,10 +581,7 @@ void P_GroupLines(void)
 //
 // P_SetupLevel
 //
-void P_SetupLevel(int episode,
-                  int map,
-                  int playermask,
-                  skill_t skill)
+void P_SetupLevel(int episode, int map, int playermask, skill_t skill)
 {
     int i;
     char lumpname[9];
@@ -599,9 +621,13 @@ void P_SetupLevel(int episode,
     if (gamemode == commercial)
     {
         if (map < 10)
+        {
             sprintf(lumpname, "map0%i", map);
+        }
         else
+        {
             sprintf(lumpname, "map%i", map);
+        }
     }
     else
     {
@@ -638,11 +664,13 @@ void P_SetupLevel(int episode,
     if (deathmatch)
     {
         for (i = 0; i < MAXPLAYERS; i++)
+        {
             if (playeringame[i])
             {
                 players[i].mo = NULL;
                 G_DeathMatchSpawnPlayer(i);
             }
+        }
     }
 
     // clear special respawning que
@@ -656,7 +684,9 @@ void P_SetupLevel(int episode,
 
     // preload graphics
     if (precache)
+    {
         R_PrecacheLevel();
+    }
 
     // printf ("free memory: 0x%x\n", Z_FreeMemory());
 }

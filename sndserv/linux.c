@@ -45,9 +45,7 @@ static const char rcsid[] = "$Id: linux.c,v 1.3 1997/01/26 07:45:01 b1 Exp $";
 
 int audio_fd;
 
-void myioctl(int fd,
-             int command,
-             int *arg)
+void myioctl(int fd, int command, int *arg)
 {
     int rc;
     extern int errno;
@@ -65,15 +63,16 @@ void I_InitMusic(void)
 {
 }
 
-void I_InitSound(int samplerate,
-                 int samplesize)
+void I_InitSound(int samplerate, int samplesize)
 {
 
     int i;
 
     audio_fd = open("/dev/dsp", O_WRONLY);
     if (audio_fd < 0)
+    {
         fprintf(stderr, "Could not open /dev/dsp\n");
+    }
 
     i = 11 | (2 << 16);
     myioctl(audio_fd, SNDCTL_DSP_SETFRAGMENT, &i);
@@ -86,13 +85,16 @@ void I_InitSound(int samplerate,
 
     myioctl(audio_fd, SNDCTL_DSP_GETFMTS, &i);
     if (i &= AFMT_S16_LE)
+    {
         myioctl(audio_fd, SNDCTL_DSP_SETFMT, &i);
+    }
     else
+    {
         fprintf(stderr, "Could not play signed 16 data\n");
+    }
 }
 
-void I_SubmitOutputBuffer(void *samples,
-                          int samplecount)
+void I_SubmitOutputBuffer(void *samples, int samplecount)
 {
     write(audio_fd, samples, samplecount * 4);
 }

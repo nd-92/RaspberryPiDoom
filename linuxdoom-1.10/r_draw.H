@@ -52,8 +52,7 @@ void R_DrawFuzzColumnLow(void);
 void R_DrawTranslatedColumn(void);
 void R_DrawTranslatedColumnLow(void);
 
-void R_VideoErase(unsigned ofs,
-                  int count);
+void R_VideoErase(unsigned ofs, int count);
 
 extern int ds_y;
 extern int ds_x1;
@@ -79,8 +78,7 @@ void R_DrawSpan(void);
 // Low resolution mode, 160x200?
 void R_DrawSpanLow(void);
 
-void R_InitBuffer(int width,
-                  int height);
+void R_InitBuffer(int width, int height);
 
 // Initialize color translation tables,
 //  for player rendering etc.

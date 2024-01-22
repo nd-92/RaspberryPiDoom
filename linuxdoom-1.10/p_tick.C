@@ -22,8 +22,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-    rcsid[] = "$Id: p_tick.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
+static const char rcsid[] = "$Id: p_tick.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 
 #include "z_zone.H"
 #include "p_local.H"
@@ -102,7 +101,9 @@ void P_RunThinkers(void)
         else
         {
             if (currentthinker->function.acp1)
+            {
                 currentthinker->function.acp1(currentthinker);
+            }
         }
         currentthinker = currentthinker->next;
     }
@@ -118,7 +119,9 @@ void P_Ticker(void)
 
     // run the tic
     if (paused)
+    {
         return;
+    }
 
     // pause if in menu and at least one tic has been run
     if (!netgame && menuactive && !demoplayback && players[consoleplayer].viewz != 1)
@@ -127,8 +130,12 @@ void P_Ticker(void)
     }
 
     for (i = 0; i < MAXPLAYERS; i++)
+    {
         if (playeringame[i])
+        {
             P_PlayerThink(&players[i]);
+        }
+    }
 
     P_RunThinkers();
     P_UpdateSpecials();

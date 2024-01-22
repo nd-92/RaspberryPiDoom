@@ -23,8 +23,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-    rcsid[] = "$Id: r_plane.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
+static const char rcsid[] = "$Id: r_plane.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 
 #include <stdlib.h>
 
@@ -110,9 +109,7 @@ void R_InitPlanes(void)
 //
 // BASIC PRIMITIVE
 //
-void R_MapPlane(int y,
-                int x1,
-                int x2)
+void R_MapPlane(int y, int x1, int x2)
 {
     angle_t angle;
     fixed_t distance;
@@ -146,13 +143,17 @@ void R_MapPlane(int y,
     ds_yfrac = -viewy - FixedMul(finesine[angle], length);
 
     if (fixedcolormap)
+    {
         ds_colormap = fixedcolormap;
+    }
     else
     {
         index = distance >> LIGHTZSHIFT;
 
         if (index >= MAXLIGHTZ)
+        {
             index = MAXLIGHTZ - 1;
+        }
 
         ds_colormap = planezlight[index];
     }
@@ -198,10 +199,7 @@ void R_ClearPlanes(void)
 //
 // R_FindPlane
 //
-visplane_t *
-R_FindPlane(fixed_t height,
-            int picnum,
-            int lightlevel)
+visplane_t *R_FindPlane(fixed_t height, int picnum, int lightlevel)
 {
     visplane_t *check;
 
@@ -220,10 +218,14 @@ R_FindPlane(fixed_t height,
     }
 
     if (check < lastvisplane)
+    {
         return check;
+    }
 
     if (lastvisplane - visplanes == MAXVISPLANES)
+    {
         I_Error("R_FindPlane: no more visplanes");
+    }
 
     lastvisplane++;
 
@@ -241,10 +243,7 @@ R_FindPlane(fixed_t height,
 //
 // R_CheckPlane
 //
-visplane_t *
-R_CheckPlane(visplane_t *pl,
-             int start,
-             int stop)
+visplane_t *R_CheckPlane(visplane_t *pl, int start, int stop)
 {
     int intrl;
     int intrh;
@@ -275,8 +274,12 @@ R_CheckPlane(visplane_t *pl,
     }
 
     for (x = intrl; x <= intrh; x++)
+    {
         if (pl->top[x] != 0xff)
+        {
             break;
+        }
+    }
 
     if (x > intrh)
     {
@@ -304,11 +307,7 @@ R_CheckPlane(visplane_t *pl,
 //
 // R_MakeSpans
 //
-void R_MakeSpans(int x,
-                 int t1,
-                 int b1,
-                 int t2,
-                 int b2)
+void R_MakeSpans(int x, int t1, int b1, int t2, int b2)
 {
     while (t1 < t2 && t1 <= b1)
     {
@@ -347,22 +346,27 @@ void R_DrawPlanes(void)
 
 #ifdef RANGECHECK
     if (ds_p - drawsegs > MAXDRAWSEGS)
-        I_Error("R_DrawPlanes: drawsegs overflow (%i)",
-                ds_p - drawsegs);
+    {
+        I_Error("R_DrawPlanes: drawsegs overflow (%i)", ds_p - drawsegs);
+    }
 
     if (lastvisplane - visplanes > MAXVISPLANES)
-        I_Error("R_DrawPlanes: visplane overflow (%i)",
-                lastvisplane - visplanes);
+    {
+        I_Error("R_DrawPlanes: visplane overflow (%i)", lastvisplane - visplanes);
+    }
 
     if (lastopening - openings > MAXOPENINGS)
-        I_Error("R_DrawPlanes: opening overflow (%i)",
-                lastopening - openings);
+    {
+        I_Error("R_DrawPlanes: opening overflow (%i)", lastopening - openings);
+    }
 #endif
 
     for (pl = visplanes; pl < lastvisplane; pl++)
     {
         if (pl->minx > pl->maxx)
+        {
             continue;
+        }
 
         // sky flat
         if (pl->picnum == skyflatnum)
@@ -392,18 +396,20 @@ void R_DrawPlanes(void)
         }
 
         // regular flat
-        ds_source = (byte *)W_CacheLumpNum(firstflat +
-                                               flattranslation[pl->picnum],
-                                           PU_STATIC);
+        ds_source = (byte *)W_CacheLumpNum(firstflat + flattranslation[pl->picnum], PU_STATIC);
 
         planeheight = abs(pl->height - viewz);
         light = (pl->lightlevel >> LIGHTSEGSHIFT) + extralight;
 
         if (light >= LIGHTLEVELS)
+        {
             light = LIGHTLEVELS - 1;
+        }
 
         if (light < 0)
+        {
             light = 0;
+        }
 
         planezlight = zlight[light];
 
@@ -414,10 +420,7 @@ void R_DrawPlanes(void)
 
         for (x = pl->minx; x <= stop; x++)
         {
-            R_MakeSpans(x, pl->top[x - 1],
-                        pl->bottom[x - 1],
-                        pl->top[x],
-                        pl->bottom[x]);
+            R_MakeSpans(x, pl->top[x - 1], pl->bottom[x - 1], pl->top[x], pl->bottom[x]);
         }
 
         Z_ChangeTag(ds_source, PU_CACHE);

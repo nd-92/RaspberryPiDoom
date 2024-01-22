@@ -24,8 +24,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-    rcsid[] = "$Id: p_maputl.c,v 1.5 1997/02/03 22:45:11 b1 Exp $";
+static const char rcsid[] = "$Id: p_maputl.c,v 1.5 1997/02/03 22:45:11 b1 Exp $";
 
 #include <stdlib.h>
 
@@ -42,9 +41,7 @@ static const char
 // Gives an estimation of distance (not exact)
 //
 
-fixed_t
-P_AproxDistance(fixed_t dx,
-                fixed_t dy)
+fixed_t P_AproxDistance(fixed_t dx, fixed_t dy)
 {
     dx = abs(dx);
     dy = abs(dy);
@@ -57,9 +54,7 @@ P_AproxDistance(fixed_t dx,
 // P_PointOnLineSide
 // Returns 0 or 1
 //
-int P_PointOnLineSide(fixed_t x,
-                      fixed_t y,
-                      line_t *line)
+int P_PointOnLineSide(fixed_t x, fixed_t y, line_t *line)
 {
     fixed_t dx;
     fixed_t dy;
@@ -69,14 +64,18 @@ int P_PointOnLineSide(fixed_t x,
     if (!line->dx)
     {
         if (x <= line->v1->x)
+        {
             return line->dy > 0;
+        }
 
         return line->dy < 0;
     }
     if (!line->dy)
     {
         if (y <= line->v1->y)
+        {
             return line->dx < 0;
+        }
 
         return line->dx > 0;
     }
@@ -88,8 +87,10 @@ int P_PointOnLineSide(fixed_t x,
     right = FixedMul(dy, line->dx >> FRACBITS);
 
     if (right < left)
-        return 0; // front side
-    return 1;     // back side
+    {
+        return 0;
+    }         // front side
+    return 1; // back side
 }
 
 //
@@ -97,8 +98,7 @@ int P_PointOnLineSide(fixed_t x,
 // Considers the line to be infinite
 // Returns side 0 or 1, -1 if box crosses the line.
 //
-int P_BoxOnLineSide(fixed_t *tmbox,
-                    line_t *ld)
+int P_BoxOnLineSide(fixed_t *tmbox, line_t *ld)
 {
     int p1;
     int p2;
@@ -145,9 +145,7 @@ int P_BoxOnLineSide(fixed_t *tmbox,
 // P_PointOnDivlineSide
 // Returns 0 or 1.
 //
-int P_PointOnDivlineSide(fixed_t x,
-                         fixed_t y,
-                         divline_t *line)
+int P_PointOnDivlineSide(fixed_t x, fixed_t y, divline_t *line)
 {
     fixed_t dx;
     fixed_t dy;
@@ -157,14 +155,18 @@ int P_PointOnDivlineSide(fixed_t x,
     if (!line->dx)
     {
         if (x <= line->x)
+        {
             return line->dy > 0;
+        }
 
         return line->dy < 0;
     }
     if (!line->dy)
     {
         if (y <= line->y)
+        {
             return line->dx < 0;
+        }
 
         return line->dx > 0;
     }
@@ -176,7 +178,9 @@ int P_PointOnDivlineSide(fixed_t x,
     if ((line->dy ^ line->dx ^ dx ^ dy) & 0x80000000)
     {
         if ((line->dy ^ dx) & 0x80000000)
-            return 1; // (left is negative)
+        {
+            return 1;
+        } // (left is negative)
         return 0;
     }
 
@@ -184,15 +188,16 @@ int P_PointOnDivlineSide(fixed_t x,
     right = FixedMul(dy >> 8, line->dx >> 8);
 
     if (right < left)
-        return 0; // front side
-    return 1;     // back side
+    {
+        return 0;
+    }         // front side
+    return 1; // back side
 }
 
 //
 // P_MakeDivline
 //
-void P_MakeDivline(line_t *li,
-                   divline_t *dl)
+void P_MakeDivline(line_t *li, divline_t *dl)
 {
     dl->x = li->v1->x;
     dl->y = li->v1->y;
@@ -207,9 +212,7 @@ void P_MakeDivline(line_t *li,
 // This is only called by the addthings
 // and addlines traversers.
 //
-fixed_t
-P_InterceptVector(divline_t *v2,
-                  divline_t *v1)
+fixed_t P_InterceptVector(divline_t *v2, divline_t *v1)
 {
 #if 1
     fixed_t frac;
@@ -219,11 +222,12 @@ P_InterceptVector(divline_t *v2,
     den = FixedMul(v1->dy >> 8, v2->dx) - FixedMul(v1->dx >> 8, v2->dy);
 
     if (den == 0)
+    {
         return 0;
+    }
     //	I_Error ("P_InterceptVector: parallel");
 
-    num =
-        FixedMul((v1->x - v2->x) >> 8, v1->dy) + FixedMul((v2->y - v1->y) >> 8, v1->dx);
+    num = FixedMul((v1->x - v2->x) >> 8, v1->dy) + FixedMul((v2->y - v1->y) >> 8, v1->dx);
 
     frac = FixedDiv(num, den);
 
@@ -289,9 +293,13 @@ void P_LineOpening(line_t *linedef)
     back = linedef->backsector;
 
     if (front->ceilingheight < back->ceilingheight)
+    {
         opentop = front->ceilingheight;
+    }
     else
+    {
         opentop = back->ceilingheight;
+    }
 
     if (front->floorheight > back->floorheight)
     {
@@ -328,12 +336,18 @@ void P_UnsetThingPosition(mobj_t *thing)
         // inert things don't need to be in blockmap?
         // unlink from subsector
         if (thing->snext)
+        {
             thing->snext->sprev = thing->sprev;
+        }
 
         if (thing->sprev)
+        {
             thing->sprev->snext = thing->snext;
+        }
         else
+        {
             thing->subsector->sector->thinglist = thing->snext;
+        }
     }
 
     if (!(thing->flags & MF_NOBLOCKMAP))
@@ -341,10 +355,14 @@ void P_UnsetThingPosition(mobj_t *thing)
         // inert things don't need to be in blockmap
         // unlink from block map
         if (thing->bnext)
+        {
             thing->bnext->bprev = thing->bprev;
+        }
 
         if (thing->bprev)
+        {
             thing->bprev->bnext = thing->bnext;
+        }
         else
         {
             blockx = (thing->x - bmaporgx) >> MAPBLOCKSHIFT;
@@ -385,7 +403,9 @@ void P_SetThingPosition(mobj_t *thing)
         thing->snext = sec->thinglist;
 
         if (sec->thinglist)
+        {
             sec->thinglist->sprev = thing;
+        }
 
         sec->thinglist = thing;
     }
@@ -403,7 +423,9 @@ void P_SetThingPosition(mobj_t *thing)
             thing->bprev = NULL;
             thing->bnext = *link;
             if (*link)
+            {
                 (*link)->bprev = thing;
+            }
 
             *link = thing;
         }
@@ -431,10 +453,7 @@ void P_SetThingPosition(mobj_t *thing)
 // to P_BlockLinesIterator, then make one or more calls
 // to it.
 //
-boolean
-P_BlockLinesIterator(int x,
-                     int y,
-                     boolean (*func)(line_t *))
+boolean P_BlockLinesIterator(int x, int y, boolean (*func)(line_t *))
 {
     int offset;
     short *list;
@@ -454,12 +473,16 @@ P_BlockLinesIterator(int x,
         ld = &lines[*list];
 
         if (ld->validcount == validcount)
-            continue; // line has already been checked
+        {
+            continue;
+        } // line has already been checked
 
         ld->validcount = validcount;
 
         if (!func(ld))
+        {
             return false;
+        }
     }
     return true; // everything was checked
 }
@@ -467,10 +490,7 @@ P_BlockLinesIterator(int x,
 //
 // P_BlockThingsIterator
 //
-boolean
-P_BlockThingsIterator(int x,
-                      int y,
-                      boolean (*func)(mobj_t *))
+boolean P_BlockThingsIterator(int x, int y, boolean (*func)(mobj_t *))
 {
     mobj_t *mobj;
 
@@ -479,12 +499,12 @@ P_BlockThingsIterator(int x,
         return true;
     }
 
-    for (mobj = blocklinks[y * bmapwidth + x];
-         mobj;
-         mobj = mobj->bnext)
+    for (mobj = blocklinks[y * bmapwidth + x]; mobj; mobj = mobj->bnext)
     {
         if (!func(mobj))
+        {
             return false;
+        }
     }
     return true;
 }
@@ -509,8 +529,7 @@ int ptflags;
 // are on opposite sides of the trace.
 // Returns true if earlyout and a solid line hit.
 //
-boolean
-PIT_AddLineIntercepts(line_t *ld)
+boolean PIT_AddLineIntercepts(line_t *ld)
 {
     int s1;
     int s2;
@@ -530,14 +549,18 @@ PIT_AddLineIntercepts(line_t *ld)
     }
 
     if (s1 == s2)
-        return true; // line isn't crossed
+    {
+        return true;
+    } // line isn't crossed
 
     // hit the line
     P_MakeDivline(ld, &dl);
     frac = P_InterceptVector(&trace, &dl);
 
     if (frac < 0)
-        return true; // behind source
+    {
+        return true;
+    } // behind source
 
     // try to early out the check
     if (earlyout && frac < FRACUNIT && !ld->backsector)
@@ -596,7 +619,9 @@ boolean PIT_AddThingIntercepts(mobj_t *thing)
     s2 = P_PointOnDivlineSide(x2, y2, &trace);
 
     if (s1 == s2)
-        return true; // line isn't crossed
+    {
+        return true;
+    } // line isn't crossed
 
     dl.x = x1;
     dl.y = y1;
@@ -606,7 +631,9 @@ boolean PIT_AddThingIntercepts(mobj_t *thing)
     frac = P_InterceptVector(&trace, &dl);
 
     if (frac < 0)
-        return true; // behind source
+    {
+        return true;
+    } // behind source
 
     intercept_p->frac = frac;
     intercept_p->isaline = false;
@@ -621,9 +648,7 @@ boolean PIT_AddThingIntercepts(mobj_t *thing)
 // Returns true if the traverser function returns true
 // for all lines.
 //
-boolean
-P_TraverseIntercepts(traverser_t func,
-                     fixed_t maxfrac)
+boolean P_TraverseIntercepts(traverser_t func, fixed_t maxfrac)
 {
     int count;
     fixed_t dist;
@@ -647,7 +672,9 @@ P_TraverseIntercepts(traverser_t func,
         }
 
         if (dist > maxfrac)
-            return true; // checked everything in range
+        {
+            return true;
+        } // checked everything in range
 
 #if 0 // UNUSED
     {
@@ -662,7 +689,9 @@ P_TraverseIntercepts(traverser_t func,
 #endif
 
         if (!func(in))
-            return false; // don't bother going farther
+        {
+            return false;
+        } // don't bother going farther
 
         in->frac = MAXINT;
     }
@@ -677,13 +706,7 @@ P_TraverseIntercepts(traverser_t func,
 // Returns true if the traverser function returns true
 // for all lines.
 //
-boolean
-P_PathTraverse(fixed_t x1,
-               fixed_t y1,
-               fixed_t x2,
-               fixed_t y2,
-               int flags,
-               boolean (*trav)(intercept_t *))
+boolean P_PathTraverse(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2, int flags, boolean (*trav)(intercept_t *))
 {
     fixed_t xt1;
     fixed_t yt1;
@@ -712,10 +735,14 @@ P_PathTraverse(fixed_t x1,
     intercept_p = intercepts;
 
     if (((x1 - bmaporgx) & (MAPBLOCKSIZE - 1)) == 0)
-        x1 += FRACUNIT; // don't side exactly on a line
+    {
+        x1 += FRACUNIT;
+    } // don't side exactly on a line
 
     if (((y1 - bmaporgy) & (MAPBLOCKSIZE - 1)) == 0)
-        y1 += FRACUNIT; // don't side exactly on a line
+    {
+        y1 += FRACUNIT;
+    } // don't side exactly on a line
 
     trace.x = x1;
     trace.y = y1;
@@ -784,13 +811,17 @@ P_PathTraverse(fixed_t x1,
         if (flags & PT_ADDLINES)
         {
             if (!P_BlockLinesIterator(mapx, mapy, PIT_AddLineIntercepts))
-                return false; // early out
+            {
+                return false;
+            } // early out
         }
 
         if (flags & PT_ADDTHINGS)
         {
             if (!P_BlockThingsIterator(mapx, mapy, PIT_AddThingIntercepts))
-                return false; // early out
+            {
+                return false;
+            } // early out
         }
 
         if (mapx == xt2 && mapy == yt2)

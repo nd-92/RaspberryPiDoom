@@ -22,8 +22,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-    rcsid[] = "$Id: p_lights.c,v 1.5 1997/02/03 22:45:11 b1 Exp $";
+static const char rcsid[] = "$Id: p_lights.c,v 1.5 1997/02/03 22:45:11 b1 Exp $";
 
 #include "z_zone.H"
 #include "m_random.H"
@@ -46,14 +45,20 @@ void T_FireFlicker(fireflicker_t *flick)
     int amount;
 
     if (--flick->count)
+    {
         return;
+    }
 
     amount = (P_Random() & 3) * 16;
 
     if (flick->sector->lightlevel - amount < flick->minlight)
+    {
         flick->sector->lightlevel = flick->minlight;
+    }
     else
+    {
         flick->sector->lightlevel = flick->maxlight - amount;
+    }
 
     flick->count = 4;
 }
@@ -91,7 +96,9 @@ void P_SpawnFireFlicker(sector_t *sector)
 void T_LightFlash(lightflash_t *flash)
 {
     if (--flash->count)
+    {
         return;
+    }
 
     if (flash->sector->lightlevel == flash->maxlight)
     {
@@ -141,7 +148,9 @@ void P_SpawnLightFlash(sector_t *sector)
 void T_StrobeFlash(strobe_t *flash)
 {
     if (--flash->count)
+    {
         return;
+    }
 
     if (flash->sector->lightlevel == flash->minlight)
     {
@@ -160,9 +169,7 @@ void T_StrobeFlash(strobe_t *flash)
 // After the map has been loaded, scan each sector
 // for specials that spawn thinkers
 //
-void P_SpawnStrobeFlash(sector_t *sector,
-                        int fastOrSlow,
-                        int inSync)
+void P_SpawnStrobeFlash(sector_t *sector, int fastOrSlow, int inSync)
 {
     strobe_t *flash;
 
@@ -178,15 +185,21 @@ void P_SpawnStrobeFlash(sector_t *sector,
     flash->minlight = P_FindMinSurroundingLight(sector, sector->lightlevel);
 
     if (flash->minlight == flash->maxlight)
+    {
         flash->minlight = 0;
+    }
 
     // nothing special about it during gameplay
     sector->special = 0;
 
     if (!inSync)
+    {
         flash->count = (P_Random() & 7) + 1;
+    }
     else
+    {
         flash->count = 1;
+    }
 }
 
 //
@@ -202,7 +215,9 @@ void EV_StartLightStrobing(line_t *line)
     {
         sec = &sectors[secnum];
         if (sec->specialdata)
+        {
             continue;
+        }
 
         P_SpawnStrobeFlash(sec, SLOWDARK, 0);
     }
@@ -232,9 +247,13 @@ void EV_TurnTagLightsOff(line_t *line)
                 templine = sector->lines[i];
                 tsec = getNextSector(templine, sector);
                 if (!tsec)
+                {
                     continue;
+                }
                 if (tsec->lightlevel < min)
+                {
                     min = tsec->lightlevel;
+                }
             }
             sector->lightlevel = min;
         }
@@ -244,8 +263,7 @@ void EV_TurnTagLightsOff(line_t *line)
 //
 // TURN LINE'S TAG LIGHTS ON
 //
-void EV_LightTurnOn(line_t *line,
-                    int bright)
+void EV_LightTurnOn(line_t *line, int bright)
 {
     int i;
     int j;
@@ -270,10 +288,14 @@ void EV_LightTurnOn(line_t *line,
                     temp = getNextSector(templine, sector);
 
                     if (!temp)
+                    {
                         continue;
+                    }
 
                     if (temp->lightlevel > bright)
+                    {
                         bright = temp->lightlevel;
+                    }
                 }
             }
             sector->lightlevel = bright;

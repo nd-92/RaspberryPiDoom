@@ -54,8 +54,6 @@ void openwad(char *wadname);
 //  0x80's.  Returns the data length in len.
 //
 
-void *
-getsfx(char *sfxname,
-       int *len);
+void *getsfx(char *sfxname, int *len);
 
 #endif

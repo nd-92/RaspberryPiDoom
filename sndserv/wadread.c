@@ -118,7 +118,9 @@ static void derror(char *msg)
 void strupr(char *s)
 {
     while (*s)
+    {
         *s++ = toupper(*s);
+    }
 }
 
 int filelength(int handle)
@@ -126,7 +128,9 @@ int filelength(int handle)
     struct stat fileinfo;
 
     if (fstat(handle, &fileinfo) == -1)
+    {
         fprintf(stderr, "Error fstating\n");
+    }
 
     return fileinfo.st_size;
 }
@@ -146,12 +150,16 @@ void openwad(char *wadname)
     wadfile = open(wadname, O_RDONLY);
 
     if (wadfile < 0)
+    {
         derror("Could not open wadfile");
+    }
 
     read(wadfile, &header, sizeof header);
 
     if (strncmp(header.identification, "IWAD", 4))
+    {
         derror("wadfile has weirdo header");
+    }
 
     numlumps = LONG(header.numlumps);
     tableoffset = LONG(header.infotableofs);
@@ -175,9 +183,7 @@ void openwad(char *wadname)
     }
 }
 
-void *
-loadlump(char *lumpname,
-         int *size)
+void *loadlump(char *lumpname, int *size)
 {
 
     int i;
@@ -186,7 +192,9 @@ loadlump(char *lumpname,
     for (i = 0; i < numlumps; i++)
     {
         if (!strncasecmp(lumpinfo[i].name, lumpname, 8))
+        {
             break;
+        }
     }
 
     if (i == numlumps)
@@ -206,9 +214,7 @@ loadlump(char *lumpname,
     return lump;
 }
 
-void *
-getsfx(char *sfxname,
-       int *len)
+void *getsfx(char *sfxname, int *len)
 {
 
     unsigned char *sfx;
@@ -226,7 +232,9 @@ getsfx(char *sfxname,
     paddedsize = ((size - 8 + (SAMPLECOUNT - 1)) / SAMPLECOUNT) * SAMPLECOUNT;
     paddedsfx = (unsigned char *)realloc(sfx, paddedsize + 8);
     for (i = size; i < paddedsize + 8; i++)
+    {
         paddedsfx[i] = 128;
+    }
 
     *len = paddedsize;
     return (void *)(paddedsfx + 8);

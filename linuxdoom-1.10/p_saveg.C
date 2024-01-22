@@ -21,8 +21,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-	rcsid[] = "$Id: p_tick.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
+static const char rcsid[] = "$Id: p_tick.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 
 #include "i_system.H"
 #include "z_zone.H"
@@ -50,7 +49,9 @@ void P_ArchivePlayers(void)
 	for (i = 0; i < MAXPLAYERS; i++)
 	{
 		if (!playeringame[i])
+		{
 			continue;
+		}
 
 		PADSAVEP();
 
@@ -78,7 +79,9 @@ void P_UnArchivePlayers(void)
 	for (i = 0; i < MAXPLAYERS; i++)
 	{
 		if (!playeringame[i])
+		{
 			continue;
+		}
 
 		PADSAVEP();
 
@@ -135,7 +138,9 @@ void P_ArchiveWorld(void)
 		for (j = 0; j < 2; j++)
 		{
 			if (li->sidenum[j] == -1)
+			{
 				continue;
+			}
 
 			si = &sides[li->sidenum[j]];
 
@@ -187,7 +192,9 @@ void P_UnArchiveWorld(void)
 		for (j = 0; j < 2; j++)
 		{
 			if (li->sidenum[j] == -1)
+			{
 				continue;
+			}
 			si = &sides[li->sidenum[j]];
 			si->textureoffset = *get++ << FRACBITS;
 			si->rowoffset = *get++ << FRACBITS;
@@ -230,7 +237,9 @@ void P_ArchiveThinkers(void)
 			mobj->state = (state_t *)(mobj->state - states);
 
 			if (mobj->player)
+			{
 				mobj->player = (player_t *)((mobj->player - players) + 1);
+			}
 			continue;
 		}
 
@@ -258,9 +267,13 @@ void P_UnArchiveThinkers(void)
 		next = currentthinker->next;
 
 		if (currentthinker->function.acp1 == (actionf_p1)P_MobjThinker)
+		{
 			P_RemoveMobj((mobj_t *)currentthinker);
+		}
 		else
+		{
 			Z_Free(currentthinker);
+		}
 
 		currentthinker = next;
 	}
@@ -346,8 +359,12 @@ void P_ArchiveSpecials(void)
 		if (th->function.acv == (actionf_v)NULL)
 		{
 			for (i = 0; i < MAXCEILINGS; i++)
+			{
 				if (activeceilings[i] == (ceiling_t *)th)
+				{
 					break;
+				}
+			}
 
 			if (i < MAXCEILINGS)
 			{
@@ -475,7 +492,9 @@ void P_UnArchiveSpecials(void)
 			ceiling->sector->specialdata = ceiling;
 
 			if (ceiling->thinker.function.acp1)
+			{
 				ceiling->thinker.function.acp1 = (actionf_p1)T_MoveCeiling;
+			}
 
 			P_AddThinker(&ceiling->thinker);
 			P_AddActiveCeiling(ceiling);
@@ -512,7 +531,9 @@ void P_UnArchiveSpecials(void)
 			plat->sector->specialdata = plat;
 
 			if (plat->thinker.function.acp1)
+			{
 				plat->thinker.function.acp1 = (actionf_p1)T_PlatRaise;
+			}
 
 			P_AddThinker(&plat->thinker);
 			P_AddActivePlat(plat);

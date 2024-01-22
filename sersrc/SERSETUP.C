@@ -45,13 +45,19 @@ void write_buffer(char *buffer, unsigned int count)
 
 	// if this would overrun the buffer, throw everything else out
 	if (outque.head - outque.tail + count > QUESIZE)
+	{
 		outque.tail = outque.head;
+	}
 
 	while (count--)
+	{
 		write_byte(*buffer++);
+	}
 
 	if (INPUT(uart + LINE_STATUS_REGISTER) & 0x40)
+	{
 		jump_start();
+	}
 }
 
 /*
@@ -85,7 +91,9 @@ void Error(char *error, ...)
 	ShutdownPort();
 
 	if (vectorishooked)
+	{
 		setvect(doomcom.intnum, olddoomvect);
+	}
 
 	if (error)
 	{
@@ -139,8 +147,10 @@ boolean ReadPacket(void)
 	{
 		c = read_byte();
 		if (c < 0)
-			return false; // haven't read a complete packet
-						  // printf ("%c",c);
+		{
+			return false;
+		} // haven't read a complete packet
+		  // printf ("%c",c);
 		if (inescape)
 		{
 			inescape = false;
@@ -157,7 +167,9 @@ boolean ReadPacket(void)
 		}			  // or a literal FRAMECHAR
 
 		if (packetlen >= MAXPACKET)
-			continue; // oversize packet
+		{
+			continue;
+		} // oversize packet
 		packet[packetlen] = c;
 		packetlen++;
 	} while (1);
@@ -178,12 +190,16 @@ void WritePacket(char *buffer, int len)
 
 	b = 0;
 	if (len > MAXPACKET)
+	{
 		return;
+	}
 
 	while (len--)
 	{
 		if (*buffer == FRAMECHAR)
-			localbuffer[b++] = FRAMECHAR; // escape it for literal
+		{
+			localbuffer[b++] = FRAMECHAR;
+		} // escape it for literal
 		localbuffer[b++] = *buffer++;
 	}
 
@@ -219,7 +235,9 @@ void interrupt NetISR(void)
 			memcpy(&doomcom.data, &packet, packetlen);
 		}
 		else
+		{
 			doomcom.remotenode = -1;
+		}
 	}
 	// I_ColorBlack (0,0,0);
 }
@@ -254,15 +272,21 @@ void Connect(void)
 	// and the interrupt table
 	//
 	if (CheckParm("-player1"))
+	{
 		idnum = 0;
+	}
 	else if (CheckParm("-player2"))
+	{
 		idnum = 999999;
+	}
 	else
 	{
 		gettime(&time);
 		idnum = time.ti_sec * 100 + time.ti_hund;
 		for (i = 0; i < 512; i++)
+		{
 			idnum += ((unsigned far *)0)[i];
+		}
 		idnum %= 1000000;
 	}
 
@@ -295,7 +319,9 @@ void Connect(void)
 		while (bioskey(1))
 		{
 			if ((bioskey(0) & 0xff) == 27)
+			{
 				Error("\n\n" STR_NETABORT);
+			}
 		}
 
 		if (ReadPacket())
@@ -303,11 +329,17 @@ void Connect(void)
 			packet[packetlen] = 0;
 			printf("read : %s\n", packet);
 			if (packetlen != 10)
+			{
 				continue;
+			}
 			if (strncmp(packet, "ID", 2))
+			{
 				continue;
+			}
 			if (!strncmp(packet + 2, idstr, 6))
+			{
 				Error("\n\n" STR_DUPLICATE);
+			}
 			strncpy(remoteidstr, packet + 2, 6);
 
 			remotestage = packet[9] - '0';
@@ -330,15 +362,21 @@ void Connect(void)
 	// decide who is who
 	//
 	if (strcmp(remoteidstr, idstr) > 0)
+	{
 		doomcom.consoleplayer = 0;
+	}
 	else
+	{
 		doomcom.consoleplayer = 1;
+	}
 
 	//
 	// flush out any extras
 	//
 	while (ReadPacket())
+	{
 		;
+	}
 }
 
 /*
@@ -391,11 +429,15 @@ void ModemResponse(char *resp)
 			while (bioskey(1))
 			{
 				if ((bioskey(0) & 0xff) == 27)
+				{
 					Error("\n" STR_RESPABORT);
+				}
 			}
 			c = read_byte();
 			if (c == -1)
+			{
 				continue;
+			}
 			if (c == '\n' || respptr == 79)
 			{
 				response[respptr] = 0;
@@ -428,7 +470,9 @@ void ReadLine(FILE *f, char *dest)
 	{
 		c = fgetc(f);
 		if (c == EOF || c == '\r' || c == '\n')
+		{
 			break;
+		}
 		*dest++ = c;
 	} while (1);
 	*dest = 0;

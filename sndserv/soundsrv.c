@@ -168,7 +168,9 @@ int mix(void)
 			channelstepremainder[0] &= 65536 - 1;
 
 			if (channels[0] >= channelsend[0])
+			{
 				channels[0] = 0;
+			}
 		}
 
 		if (channels[1])
@@ -181,7 +183,9 @@ int mix(void)
 			channelstepremainder[1] &= 65536 - 1;
 
 			if (channels[1] >= channelsend[1])
+			{
 				channels[1] = 0;
+			}
 		}
 
 		if (channels[2])
@@ -194,7 +198,9 @@ int mix(void)
 			channelstepremainder[2] &= 65536 - 1;
 
 			if (channels[2] >= channelsend[2])
+			{
 				channels[2] = 0;
+			}
 		}
 
 		if (channels[3])
@@ -207,7 +213,9 @@ int mix(void)
 			channelstepremainder[3] &= 65536 - 1;
 
 			if (channels[3] >= channelsend[3])
+			{
 				channels[3] = 0;
+			}
 		}
 
 		if (channels[4])
@@ -220,7 +228,9 @@ int mix(void)
 			channelstepremainder[4] &= 65536 - 1;
 
 			if (channels[4] >= channelsend[4])
+			{
 				channels[4] = 0;
+			}
 		}
 
 		if (channels[5])
@@ -233,7 +243,9 @@ int mix(void)
 			channelstepremainder[5] &= 65536 - 1;
 
 			if (channels[5] >= channelsend[5])
+			{
 				channels[5] = 0;
+			}
 		}
 
 		if (channels[6])
@@ -246,7 +258,9 @@ int mix(void)
 			channelstepremainder[6] &= 65536 - 1;
 
 			if (channels[6] >= channelsend[6])
+			{
 				channels[6] = 0;
+			}
 		}
 		if (channels[7])
 		{
@@ -258,7 +272,9 @@ int mix(void)
 			channelstepremainder[7] &= 65536 - 1;
 
 			if (channels[7] >= channelsend[7])
+			{
 				channels[7] = 0;
+			}
 		}
 
 		// Has been char instead of short.
@@ -271,18 +287,30 @@ int mix(void)
 		// else *rightout = dr;
 
 		if (dl > 0x7fff)
+		{
 			*leftout = 0x7fff;
+		}
 		else if (dl < -0x8000)
+		{
 			*leftout = -0x8000;
+		}
 		else
+		{
 			*leftout = dl;
+		}
 
 		if (dr > 0x7fff)
+		{
 			*rightout = 0x7fff;
+		}
 		else if (dr < -0x8000)
+		{
 			*rightout = -0x8000;
+		}
 		else
+		{
 			*rightout = dr;
+		}
 
 		leftout += step;
 		rightout += step;
@@ -290,8 +318,7 @@ int mix(void)
 	return 1;
 }
 
-void grabdata(int c,
-			  char **v)
+void grabdata(int c, char **v)
 {
 	int i;
 	char *name;
@@ -308,7 +335,9 @@ void grabdata(int c,
 	doomwaddir = getenv("DOOMWADDIR");
 
 	if (!doomwaddir)
+	{
 		doomwaddir = ".";
+	}
 
 	doom1wad = malloc(strlen(doomwaddir) + 1 + 9 + 1);
 	sprintf(doom1wad, "%s/doom1.wad", doomwaddir);
@@ -342,15 +371,25 @@ void grabdata(int c,
 	longsound = 0;
 
 	if (!access(doom2fwad, R_OK))
+	{
 		name = doom2fwad;
+	}
 	else if (!access(doom2wad, R_OK))
+	{
 		name = doom2wad;
+	}
 	else if (!access(doomuwad, R_OK))
+	{
 		name = doomuwad;
+	}
 	else if (!access(doomwad, R_OK))
+	{
 		name = doomwad;
+	}
 	else if (!access(doom1wad, R_OK))
+	{
 		name = doom1wad;
+	}
 	// else if (! access(DEVDATA "doom2.wad", R_OK) )
 	//   name = DEVDATA "doom2.wad";
 	//   else if (! access(DEVDATA "doom.wad", R_OK) )
@@ -363,7 +402,9 @@ void grabdata(int c,
 
 	openwad(name);
 	if (snd_verbose)
+	{
 		fprintf(stderr, "loading from [%s]\n", name);
+	}
 
 	for (i = 1; i < NUMSFX; i++)
 	{
@@ -371,7 +412,9 @@ void grabdata(int c,
 		{
 			S_sfx[i].data = getsfx(S_sfx[i].name, &lengths[i]);
 			if (longsound < lengths[i])
+			{
 				longsound = lengths[i];
+			}
 		}
 		else
 		{
@@ -402,10 +445,7 @@ void updatesounds(void)
 	I_SubmitOutputBuffer(mixbuffer, SAMPLECOUNT);
 }
 
-int addsfx(int sfxid,
-		   int volume,
-		   int step,
-		   int seperation)
+int addsfx(int sfxid, int volume, int step, int seperation)
 {
 	static unsigned short handlenums = 0;
 
@@ -442,15 +482,21 @@ int addsfx(int sfxid,
 	}
 
 	if (i == 8)
+	{
 		slot = oldestnum;
+	}
 	else
+	{
 		slot = i;
+	}
 
 	channels[slot] = (unsigned char *)S_sfx[sfxid].data;
 	channelsend[slot] = channels[slot] + lengths[sfxid];
 
 	if (!handlenums)
+	{
 		handlenums = 100;
+	}
 
 	channelhandles[slot] = rc = handlenums++;
 	channelstep[slot] = step;
@@ -461,21 +507,23 @@ int addsfx(int sfxid,
 	seperation += 1;
 
 	// (x^2 seperation)
-	leftvol =
-		volume - (volume * seperation * seperation) / (256 * 256);
+	leftvol = volume - (volume * seperation * seperation) / (256 * 256);
 
 	seperation = seperation - 257;
 
 	// (x^2 seperation)
-	rightvol =
-		volume - (volume * seperation * seperation) / (256 * 256);
+	rightvol = volume - (volume * seperation * seperation) / (256 * 256);
 
 	// sanity check
 	if (rightvol < 0 || rightvol > 127)
+	{
 		derror("rightvol out of bounds");
+	}
 
 	if (leftvol < 0 || leftvol > 127)
+	{
 		derror("leftvol out of bounds");
+	}
 
 	// get the proper lookup table piece
 	//  for this volume level
@@ -520,9 +568,7 @@ void initdata(void)
 
 	int *steptablemid = steptable + 128;
 
-	for (i = 0;
-		 i < sizeof(channels) / sizeof(unsigned char *);
-		 i++)
+	for (i = 0; i < sizeof(channels) / sizeof(unsigned char *); i++)
 	{
 		channels[i] = 0;
 	}
@@ -530,7 +576,9 @@ void initdata(void)
 	gettimeofday(&last, &whocares);
 
 	for (i = -128; i < 128; i++)
+	{
 		steptablemid[i] = pow(2.0, (i / 64.0)) * 65536.0;
+	}
 
 	// generates volume lookup tables
 	//  which also turn the unsigned samples
@@ -540,8 +588,12 @@ void initdata(void)
 	// vol_lookup[i*256+j] = (i*(j-128))/127;
 
 	for (i = 0; i < 128; i++)
+	{
 		for (j = 0; j < 256; j++)
+		{
 			vol_lookup[i * 256 + j] = (i * (j - 128) * 256) / 127;
+		}
+	}
 }
 
 void quit(void)
@@ -554,8 +606,7 @@ void quit(void)
 fd_set fdset;
 fd_set scratchset;
 
-int main(int c,
-		 char **v)
+int main(int c, char **v)
 {
 
 	int done = 0;
@@ -585,7 +636,9 @@ int main(int c,
 	I_InitMusic();
 
 	if (snd_verbose)
+	{
 		fprintf(stderr, "ready\n");
+	}
 
 	// parse commands and play sounds until done
 	FD_ZERO(&fdset);
@@ -616,7 +669,9 @@ int main(int c,
 					else
 					{
 						if (snd_verbose)
+						{
 							fprintf(stderr, "cmd: %c", commandbuf[0]);
+						}
 
 						switch (commandbuf[0])
 						{
@@ -630,22 +685,14 @@ int main(int c,
 								fprintf(stderr, "%s\n", commandbuf);
 							}
 
-							commandbuf[0] -=
-								commandbuf[0] >= 'a' ? 'a' - 10 : '0';
-							commandbuf[1] -=
-								commandbuf[1] >= 'a' ? 'a' - 10 : '0';
-							commandbuf[2] -=
-								commandbuf[2] >= 'a' ? 'a' - 10 : '0';
-							commandbuf[3] -=
-								commandbuf[3] >= 'a' ? 'a' - 10 : '0';
-							commandbuf[4] -=
-								commandbuf[4] >= 'a' ? 'a' - 10 : '0';
-							commandbuf[5] -=
-								commandbuf[5] >= 'a' ? 'a' - 10 : '0';
-							commandbuf[6] -=
-								commandbuf[6] >= 'a' ? 'a' - 10 : '0';
-							commandbuf[7] -=
-								commandbuf[7] >= 'a' ? 'a' - 10 : '0';
+							commandbuf[0] -= commandbuf[0] >= 'a' ? 'a' - 10 : '0';
+							commandbuf[1] -= commandbuf[1] >= 'a' ? 'a' - 10 : '0';
+							commandbuf[2] -= commandbuf[2] >= 'a' ? 'a' - 10 : '0';
+							commandbuf[3] -= commandbuf[3] >= 'a' ? 'a' - 10 : '0';
+							commandbuf[4] -= commandbuf[4] >= 'a' ? 'a' - 10 : '0';
+							commandbuf[5] -= commandbuf[5] >= 'a' ? 'a' - 10 : '0';
+							commandbuf[6] -= commandbuf[6] >= 'a' ? 'a' - 10 : '0';
+							commandbuf[7] -= commandbuf[7] >= 'a' ? 'a' - 10 : '0';
 
 							//	p<snd#><step><vol><sep>
 							sndnum = (commandbuf[0] << 4) + commandbuf[1];
@@ -697,10 +744,14 @@ int main(int c,
 		if (waitingtofinish)
 		{
 			for (i = 0; i < 8 && !channels[i]; i++)
+			{
 				;
+			}
 
 			if (i == 8)
+			{
 				done = 1;
+			}
 		}
 	}
 

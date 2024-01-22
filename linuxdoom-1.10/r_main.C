@@ -118,18 +118,24 @@ void (*spanfunc)(void);
 // Expand a given bbox
 // so that it encloses a given point.
 //
-void R_AddPointToBox(int x,
-                     int y,
-                     fixed_t *box)
+void R_AddPointToBox(int x, int y, fixed_t *box)
 {
     if (x < box[BOXLEFT])
+    {
         box[BOXLEFT] = x;
+    }
     if (x > box[BOXRIGHT])
+    {
         box[BOXRIGHT] = x;
+    }
     if (y < box[BOXBOTTOM])
+    {
         box[BOXBOTTOM] = y;
+    }
     if (y > box[BOXTOP])
+    {
         box[BOXTOP] = y;
+    }
 }
 
 //
@@ -138,9 +144,7 @@ void R_AddPointToBox(int x,
 //  check point against partition plane.
 // Returns side 0 (front) or 1 (back).
 //
-int R_PointOnSide(fixed_t x,
-                  fixed_t y,
-                  node_t *node)
+int R_PointOnSide(fixed_t x, fixed_t y, node_t *node)
 {
     fixed_t dx;
     fixed_t dy;
@@ -150,14 +154,18 @@ int R_PointOnSide(fixed_t x,
     if (!node->dx)
     {
         if (x <= node->x)
+        {
             return node->dy > 0;
+        }
 
         return node->dy < 0;
     }
     if (!node->dy)
     {
         if (y <= node->y)
+        {
             return node->dx < 0;
+        }
 
         return node->dx > 0;
     }
@@ -188,9 +196,7 @@ int R_PointOnSide(fixed_t x,
     return 1;
 }
 
-int R_PointOnSegSide(fixed_t x,
-                     fixed_t y,
-                     seg_t *line)
+int R_PointOnSegSide(fixed_t x, fixed_t y, seg_t *line)
 {
     fixed_t lx;
     fixed_t ly;
@@ -210,14 +216,18 @@ int R_PointOnSegSide(fixed_t x,
     if (!ldx)
     {
         if (x <= lx)
+        {
             return ldy > 0;
+        }
 
         return ldy < 0;
     }
     if (!ldy)
     {
         if (y <= ly)
+        {
             return ldx < 0;
+        }
 
         return ldx > 0;
     }
@@ -259,15 +269,15 @@ int R_PointOnSegSide(fixed_t x,
 
 //
 
-angle_t
-R_PointToAngle(fixed_t x,
-               fixed_t y)
+angle_t R_PointToAngle(fixed_t x, fixed_t y)
 {
     x -= viewx;
     y -= viewy;
 
     if ((!x) && (!y))
+    {
         return 0;
+    }
 
     if (x >= 0)
     {
@@ -343,11 +353,7 @@ R_PointToAngle(fixed_t x,
     return 0;
 }
 
-angle_t
-R_PointToAngle2(fixed_t x1,
-                fixed_t y1,
-                fixed_t x2,
-                fixed_t y2)
+angle_t R_PointToAngle2(fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2)
 {
     viewx = x1;
     viewy = y1;
@@ -355,9 +361,7 @@ R_PointToAngle2(fixed_t x1,
     return R_PointToAngle(x2, y2);
 }
 
-fixed_t
-R_PointToDist(fixed_t x,
-              fixed_t y)
+fixed_t R_PointToDist(fixed_t x, fixed_t y)
 {
     int angle;
     fixed_t dx;
@@ -453,12 +457,18 @@ fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
         scale = FixedDiv(num, den);
 
         if (scale > 64 * FRACUNIT)
+        {
             scale = 64 * FRACUNIT;
+        }
         else if (scale < 256)
+        {
             scale = 256;
+        }
     }
     else
+    {
         scale = 64 * FRACUNIT;
+    }
 
     return scale;
 }
@@ -511,24 +521,31 @@ void R_InitTextureMapping(void)
     //
     // Calc focallength
     //  so FIELDOFVIEW angles covers SCREENWIDTH.
-    focallength = FixedDiv(centerxfrac,
-                           finetangent[FINEANGLES / 4 + FIELDOFVIEW / 2]);
+    focallength = FixedDiv(centerxfrac, finetangent[FINEANGLES / 4 + FIELDOFVIEW / 2]);
 
     for (i = 0; i < FINEANGLES / 2; i++)
     {
         if (finetangent[i] > FRACUNIT * 2)
+        {
             t = -1;
+        }
         else if (finetangent[i] < -FRACUNIT * 2)
+        {
             t = viewwidth + 1;
+        }
         else
         {
             t = FixedMul(finetangent[i], focallength);
             t = (centerxfrac - t + FRACUNIT - 1) >> FRACBITS;
 
             if (t < -1)
+            {
                 t = -1;
+            }
             else if (t > viewwidth + 1)
+            {
                 t = viewwidth + 1;
+            }
         }
         viewangletox[i] = t;
     }
@@ -540,7 +557,9 @@ void R_InitTextureMapping(void)
     {
         i = 0;
         while (viewangletox[i] > x)
+        {
             i++;
+        }
         xtoviewangle[x] = (i << ANGLETOFINESHIFT) - ANG90;
     }
 
@@ -551,9 +570,13 @@ void R_InitTextureMapping(void)
         t = centerx - t;
 
         if (viewangletox[i] == -1)
+        {
             viewangletox[i] = 0;
+        }
         else if (viewangletox[i] == viewwidth + 1)
+        {
             viewangletox[i] = viewwidth;
+        }
     }
 
     clipangle = xtoviewangle[0];
@@ -586,10 +609,14 @@ void R_InitLightTables(void)
             level = startmap - scale / DISTMAP;
 
             if (level < 0)
+            {
                 level = 0;
+            }
 
             if (level >= NUMCOLORMAPS)
+            {
                 level = NUMCOLORMAPS - 1;
+            }
 
             zlight[i][j] = colormaps + level * 256;
         }
@@ -606,8 +633,7 @@ boolean setsizeneeded;
 int setblocks;
 int setdetail;
 
-void R_SetViewSize(int blocks,
-                   int detail)
+void R_SetViewSize(int blocks, int detail)
 {
     setsizeneeded = true;
     setblocks = blocks;
@@ -673,7 +699,9 @@ void R_ExecuteSetViewSize(void)
 
     // thing clipping
     for (i = 0; i < viewwidth; i++)
+    {
         screenheightarray[i] = viewheight;
+    }
 
     // planes
     for (i = 0; i < viewheight; i++)
@@ -699,10 +727,14 @@ void R_ExecuteSetViewSize(void)
             level = startmap - j * SCREENWIDTH / (viewwidth << detailshift) / DISTMAP;
 
             if (level < 0)
+            {
                 level = 0;
+            }
 
             if (level >= NUMCOLORMAPS)
+            {
                 level = NUMCOLORMAPS - 1;
+            }
 
             scalelight[i][j] = colormaps + level * 256;
         }
@@ -741,9 +773,7 @@ void R_Init(void)
 //
 // R_PointInSubsector
 //
-subsector_t *
-R_PointInSubsector(fixed_t x,
-                   fixed_t y)
+subsector_t *R_PointInSubsector(fixed_t x, fixed_t y)
 {
     node_t *node;
     int side;
@@ -751,7 +781,9 @@ R_PointInSubsector(fixed_t x,
 
     // single subsector is a special case
     if (!numnodes)
+    {
         return subsectors;
+    }
 
     nodenum = numnodes - 1;
 
@@ -787,16 +819,19 @@ void R_SetupFrame(player_t *player)
 
     if (player->fixedcolormap)
     {
-        fixedcolormap =
-            colormaps + player->fixedcolormap * 256 * sizeof(lighttable_t);
+        fixedcolormap = colormaps + player->fixedcolormap * 256 * sizeof(lighttable_t);
 
         walllights = scalelightfixed;
 
         for (i = 0; i < MAXLIGHTSCALE; i++)
+        {
             scalelightfixed[i] = fixedcolormap;
+        }
     }
     else
+    {
         fixedcolormap = 0;
+    }
 
     framecount++;
     validcount++;

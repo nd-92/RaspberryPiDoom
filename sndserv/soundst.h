@@ -160,15 +160,10 @@ void S_Start(void);
 // Start sound for thing at <origin>
 //  using <sound_id> from sounds.h
 //
-extern void
-S_StartSound(void *origin,
-             int sound_id);
+extern void S_StartSound(void *origin, int sound_id);
 
 // Will start a sound at a given volume.
-extern void
-S_StartSoundAtVolume(void *origin,
-                     int sound_id,
-                     int volume);
+extern void S_StartSoundAtVolume(void *origin, int sound_id, int volume);
 
 // Stop sound for thing at <origin>
 extern void S_StopSound(void *origin);
@@ -178,9 +173,7 @@ extern void S_StartMusic(int music_id);
 
 // Start music using <music_id> from sounds.h,
 //  and set whether looping
-extern void
-S_ChangeMusic(int music_id,
-              int looping);
+extern void S_ChangeMusic(int music_id, int looping);
 
 // Stops the music
 extern void S_StopMusic(void);
@@ -199,8 +192,7 @@ void S_SetSfxVolume(int volume);
 //
 // Initializes sound stuff, including volume
 //
-void S_Init(int,
-            int);
+void S_Init(int, int);
 
 //
 // SOUND IO
@@ -223,8 +215,7 @@ void I_ResumeSong(int handle);
 //  plays a song, and when the song is done,
 //  starts playing it again in an endless loop.
 // Horrible thing to do, considering.
-void I_PlaySong(int handle,
-                int looping);
+void I_PlaySong(int handle, int looping);
 
 // stops a song over 3 seconds.
 void I_StopSong(int handle);
@@ -246,19 +237,11 @@ void I_SetChannels(int channels);
 int I_GetSfxLumpNum(sfxinfo_t *);
 
 // Starts a sound in a particular sound channel.
-int I_StartSound(int id,
-                 void *data,
-                 int vol,
-                 int sep,
-                 int pitch,
-                 int priority);
+int I_StartSound(int id, void *data, int vol, int sep, int pitch, int priority);
 
 // Updates the volume, separation,
 //  and pitch of a sound channel.
-void I_UpdateSoundParams(int handle,
-                         int vol,
-                         int sep,
-                         int pitch);
+void I_UpdateSoundParams(int handle, int vol, int sep, int pitch);
 
 // Stops a sound channel.
 void I_StopSound(int handle);

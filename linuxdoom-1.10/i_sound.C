@@ -21,8 +21,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-    rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
+static const char rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 
 #include <stdint.h>
 
@@ -154,9 +153,7 @@ signed short *channelrightvol_lookup[NUM_CHANNELS];
 //
 // Safe ioctl, convenience.
 //
-void myioctl(int fd,
-             long unsigned int command,
-             int *arg)
+void myioctl(int fd, long unsigned int command, int *arg)
 {
   int rc;
   // extern int errno;
@@ -174,9 +171,7 @@ void myioctl(int fd,
 // This function loads the sound data from the WAD lump,
 //  for single sound.
 //
-void *
-getsfx(char *sfxname,
-       size_t *len)
+void *getsfx(char *sfxname, size_t *len)
 {
   unsigned char *sfx;
   unsigned char *paddedsfx;
@@ -232,7 +227,9 @@ getsfx(char *sfxname,
   // Now copy and pad.
   memcpy(paddedsfx, sfx, size);
   for (i = size; i < paddedsize + 8; i++)
+  {
     paddedsfx[i] = 128;
+  }
 
   // Remove the cached lump.
   Z_Free(sfx);
@@ -251,10 +248,7 @@ getsfx(char *sfxname,
 //  (eight, usually) of internal channels.
 // Returns a handle.
 //
-int addsfx(int sfxid,
-           int volume,
-           unsigned int step,
-           int seperation)
+int addsfx(int sfxid, int volume, unsigned int step, int seperation)
 {
   static unsigned short handlenums = 0;
 
@@ -301,10 +295,15 @@ int addsfx(int sfxid,
   // If we found a channel, fine.
   // If not, we simply overwrite the first one, 0.
   // Probably only happens at startup.
+
   if (i == NUM_CHANNELS)
+  {
     slot = oldestnum;
+  }
   else
+  {
     slot = i;
+  }
 
   // Okay, in the less recent channel,
   //  we will handle the new SFX.
@@ -315,7 +314,9 @@ int addsfx(int sfxid,
 
   // Reset current handle number, limited to 0..100.
   if (!handlenums)
+  {
     handlenums = 100;
+  }
 
   // Assign current handle number.
   // Preserved so sounds could be stopped (unused).
@@ -336,18 +337,20 @@ int addsfx(int sfxid,
   // Per left/right channel.
   //  x^2 seperation,
   //  adjust volume properly.
-  leftvol =
-      volume - ((volume * seperation * seperation) >> 16); ///(256*256);
+  leftvol = volume - ((volume * seperation * seperation) >> 16); ///(256*256);
   seperation = seperation - 257;
-  rightvol =
-      volume - ((volume * seperation * seperation) >> 16);
+  rightvol = volume - ((volume * seperation * seperation) >> 16);
 
   // Sanity check, clamp volume.
   if (rightvol < 0 || rightvol > 127)
+  {
     I_Error("rightvol out of bounds");
+  }
 
   if (leftvol < 0 || leftvol > 127)
+  {
     I_Error("leftvol out of bounds");
+  }
 
   // Get the proper lookup table piece
   //  for this volume level???
@@ -448,10 +451,7 @@ int I_GetSfxLumpNum(sfxinfo_t *sfx)
 // Pitching (that is, increased speed of playback)
 //  is set, but currently not used by mixing.
 //
-int I_StartSound(int id,
-                 int vol,
-                 int sep,
-                 int pitch)
+int I_StartSound(int id, int vol, int sep, int pitch)
 {
 
   // UNUSED
@@ -575,7 +575,9 @@ void I_UpdateSound(void)
 
         // Check whether we are done.
         if (channels[chan] >= channelsend[chan])
+        {
           channels[chan] = 0;
+        }
       }
     }
 
@@ -694,11 +696,15 @@ void I_InitSound()
   char buffer[256];
 
   if (getenv("DOOMWADDIR"))
+  {
     sprintf(buffer, "%s/%s",
             getenv("DOOMWADDIR"),
             sndserver_filename);
+  }
   else
+  {
     sprintf(buffer, "%s", sndserver_filename);
+  }
 
   // start sound process
   if (!access(buffer, X_OK))
@@ -707,7 +713,9 @@ void I_InitSound()
     sndserver = popen(buffer, "w");
   }
   else
+  {
     fprintf(stderr, "Could not start sound server [%s]\n", buffer);
+  }
 #else
 
   int i;
@@ -876,7 +884,9 @@ void I_HandleSoundTimer(__attribute__((unused)) const int ignore)
     flag = 0;
   }
   else
+  {
     return;
+  }
 
   // UNUSED, but required.
   // ignore = 0;
@@ -916,7 +926,9 @@ int I_SoundSetTimer(int duration_of_tick)
 
   // Debug.
   if (res == -1)
+  {
     fprintf(stderr, "I_SoundSetTimer: interrupt n.a.\n");
+  }
 
   return res;
 }
@@ -926,5 +938,7 @@ void I_SoundDelTimer()
 {
   // Debug.
   if (I_SoundSetTimer(0) == -1)
+  {
     fprintf(stderr, "I_SoundDelTimer: failed to remove interrupt. Doh!\n");
+  }
 }

@@ -20,8 +20,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-	rcsid[] = "$Id: p_ceilng.c,v 1.4 1997/02/03 16:47:53 b1 Exp $";
+static const char rcsid[] = "$Id: p_ceilng.c,v 1.4 1997/02/03 16:47:53 b1 Exp $";
 
 #include "z_zone.H"
 #include "doomdef.H"
@@ -57,10 +56,7 @@ void T_MoveCeiling(ceiling_t *ceiling)
 		break;
 	case 1:
 		// UP
-		res = T_MovePlane(ceiling->sector,
-						  ceiling->speed,
-						  ceiling->topheight,
-						  false, 1, ceiling->direction);
+		res = T_MovePlane(ceiling->sector, ceiling->speed, ceiling->topheight, false, 1, ceiling->direction);
 
 		if (!(leveltime & 7))
 		{
@@ -69,8 +65,7 @@ void T_MoveCeiling(ceiling_t *ceiling)
 			case silentCrushAndRaise:
 				break;
 			default:
-				S_StartSound((mobj_t *)&ceiling->sector->soundorg,
-							 sfx_stnmov);
+				S_StartSound((mobj_t *)&ceiling->sector->soundorg, sfx_stnmov);
 				// ?
 				break;
 			}
@@ -85,8 +80,7 @@ void T_MoveCeiling(ceiling_t *ceiling)
 				break;
 
 			case silentCrushAndRaise:
-				S_StartSound((mobj_t *)&ceiling->sector->soundorg,
-							 sfx_pstop);
+				S_StartSound((mobj_t *)&ceiling->sector->soundorg, sfx_pstop);
 			case fastCrushAndRaise:
 			case crushAndRaise:
 				ceiling->direction = -1;
@@ -100,10 +94,7 @@ void T_MoveCeiling(ceiling_t *ceiling)
 
 	case -1:
 		// DOWN
-		res = T_MovePlane(ceiling->sector,
-						  ceiling->speed,
-						  ceiling->bottomheight,
-						  ceiling->crush, 1, ceiling->direction);
+		res = T_MovePlane(ceiling->sector, ceiling->speed, ceiling->bottomheight, ceiling->crush, 1, ceiling->direction);
 
 		if (!(leveltime & 7))
 		{
@@ -112,8 +103,7 @@ void T_MoveCeiling(ceiling_t *ceiling)
 			case silentCrushAndRaise:
 				break;
 			default:
-				S_StartSound((mobj_t *)&ceiling->sector->soundorg,
-							 sfx_stnmov);
+				S_StartSound((mobj_t *)&ceiling->sector->soundorg, sfx_stnmov);
 			}
 		}
 
@@ -122,8 +112,7 @@ void T_MoveCeiling(ceiling_t *ceiling)
 			switch (ceiling->type)
 			{
 			case silentCrushAndRaise:
-				S_StartSound((mobj_t *)&ceiling->sector->soundorg,
-							 sfx_pstop);
+				S_StartSound((mobj_t *)&ceiling->sector->soundorg, sfx_pstop);
 			case crushAndRaise:
 				ceiling->speed = CEILSPEED;
 			case fastCrushAndRaise:
@@ -164,8 +153,7 @@ void T_MoveCeiling(ceiling_t *ceiling)
 // EV_DoCeiling
 // Move a ceiling up/down and all around!
 //
-int EV_DoCeiling(line_t *line,
-				 ceiling_e type)
+int EV_DoCeiling(line_t *line, ceiling_e type)
 {
 	int secnum;
 	int rtn;
@@ -190,7 +178,9 @@ int EV_DoCeiling(line_t *line,
 	{
 		sec = &sectors[secnum];
 		if (sec->specialdata)
+		{
 			continue;
+		}
 
 		// new door thinker
 		rtn = 1;
@@ -219,7 +209,9 @@ int EV_DoCeiling(line_t *line,
 		case lowerToFloor:
 			ceiling->bottomheight = sec->floorheight;
 			if (type != lowerToFloor)
+			{
 				ceiling->bottomheight += 8 * FRACUNIT;
+			}
 			ceiling->direction = -1;
 			ceiling->speed = CEILSPEED;
 			break;

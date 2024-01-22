@@ -20,8 +20,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-    rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
+static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 #include <stdlib.h>
 #include <string.h>
@@ -82,7 +81,9 @@ int UDPsocket(void)
     // allocate a socket
     s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (s < 0)
+    {
         I_Error("can't create socket: %s", strerror(errno));
+    }
 
     return s;
 }
@@ -90,8 +91,7 @@ int UDPsocket(void)
 //
 // BindToLocalPort
 //
-void BindToLocalPort(int s,
-                     in_port_t port)
+void BindToLocalPort(int s, in_port_t port)
 {
     int v;
     struct sockaddr_in address;
@@ -103,7 +103,9 @@ void BindToLocalPort(int s,
 
     v = bind(s, (sockaddr *)&address, sizeof(address));
     if (v == -1)
+    {
         I_Error("BindToPort: bind: %s", strerror(errno));
+    }
 }
 
 //

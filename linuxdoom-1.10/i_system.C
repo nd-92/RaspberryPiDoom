@@ -20,8 +20,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-    rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
+static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -46,10 +45,7 @@ static const char
 
 const size_t mb_used = 6;
 
-void I_Tactile(
-    __attribute__((unused)) int on,
-    __attribute__((unused)) int off,
-    __attribute__((unused)) int total)
+void I_Tactile(__attribute__((unused)) int on, __attribute__((unused)) int off, __attribute__((unused)) int total)
 {
     total = 0;
 }
@@ -84,7 +80,9 @@ int I_GetTime(void)
 
     gettimeofday(&tp, &tzp);
     if (!basetime)
+    {
         basetime = tp.tv_sec;
+    }
     newtics = (tp.tv_sec - basetime) * TICRATE + tp.tv_usec * TICRATE / 1000000;
     return newtics;
 }
@@ -161,7 +159,9 @@ void I_Error(const char *error, ...)
 
     // Shutdown. Here might be other errors.
     if (demorecording)
+    {
         G_CheckDemoStatus();
+    }
 
     D_QuitNetGame();
     I_ShutdownGraphics();

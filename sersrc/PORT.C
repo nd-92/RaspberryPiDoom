@@ -51,13 +51,21 @@ void GetUart(void)
 	int p;
 
 	if (CheckParm("-com2"))
+	{
 		comport = 2;
+	}
 	else if (CheckParm("-com3"))
+	{
 		comport = 3;
+	}
 	else if (CheckParm("-com4"))
+	{
 		comport = 4;
+	}
 	else
+	{
 		comport = 1;
+	}
 
 	regs.h.ah = 0xc0;
 	int86x(0x15, &regs, &regs, &sregs);
@@ -81,10 +89,14 @@ void GetUart(void)
 
 	p = CheckParm("-port");
 	if (p)
+	{
 		sscanf(_argv[p + 1], "0x%x", &uart);
+	}
 	p = CheckParm("-irq");
 	if (p)
+	{
 		sscanf(_argv[p + 1], "%i", &irq);
+	}
 
 	printf(STR_PORTLOOK " 0x%x, irq %i\n", uart, irq);
 }
@@ -141,8 +153,7 @@ void InitPort(void)
 	}
 	else
 	{
-		OUTPUT(uart + FIFO_CONTROL_REGISTER,
-			   FCR_FIFO_ENABLE + FCR_TRIGGER_04);
+		OUTPUT(uart + FIFO_CONTROL_REGISTER, FCR_FIFO_ENABLE + FCR_TRIGGER_04);
 		temp = INPUT(uart + INTERRUPT_ID_REGISTER);
 		if ((temp & 0xf8) == 0xc0)
 		{
@@ -160,7 +171,9 @@ void InitPort(void)
 	//
 	printf(STR_CLEARPEND);
 	for (u = 0; u < 16; u++) // clear an entire 16550 silo
+	{
 		INPUT(uart + RECEIVE_BUFFER_REGISTER);
+	}
 
 	do
 	{
@@ -231,7 +244,9 @@ void ShutdownPort(void)
 	OUTPUT(uart + MODEM_CONTROL_REGISTER, 0);
 
 	for (u = 0; u < 16; u++) // clear an entire 16550 silo
+	{
 		INPUT(uart + RECEIVE_BUFFER_REGISTER);
+	}
 
 	OUTPUT(0x20 + 1, INPUT(0x20 + 1) | (1 << irq));
 
@@ -250,7 +265,9 @@ int read_byte(void)
 	int c;
 
 	if (inque.tail >= inque.head)
+	{
 		return -1;
+	}
 	c = inque.data[inque.tail & (QUESIZE - 1)];
 	inque.tail++;
 	return c;

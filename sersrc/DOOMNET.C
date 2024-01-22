@@ -35,8 +35,12 @@ int CheckParm(char *check)
 	int i;
 
 	for (i = 1; i < myargc; i++)
+	{
 		if (!stricmp(check, myargv[i]))
+		{
 			return i;
+		}
+	}
 
 	return 0;
 }
@@ -83,7 +87,9 @@ void LaunchDOOM(void)
 		{
 			vector = *(char far *far *)(doomcom.intnum * 4);
 			if (!vector || *vector == 0xcf)
+			{
 				break;
+			}
 		}
 		if (doomcom.intnum == 0x67)
 		{
@@ -107,9 +113,13 @@ void LaunchDOOM(void)
 
 	//	spawnv  (P_WAIT, "m:\\newdoom\\doom", newargs);
 	if (!access("doom2.exe", 0))
+	{
 		spawnv(P_WAIT, "doom2", newargs);
+	}
 	else
+	{
 		spawnv(P_WAIT, "doom", newargs);
+	}
 
 #ifdef DOOM2
 	printf(STR_RETURNED "\n");

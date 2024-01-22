@@ -23,8 +23,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-    rcsid[] = "$Id: r_draw.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
+static const char rcsid[] = "$Id: r_draw.c,v 1.4 1997/02/03 16:47:55 b1 Exp $";
 #include <stdint.h>
 
 #include "doomdef.H"
@@ -107,11 +106,15 @@ void R_DrawColumn(void)
 
     // Zero length, column does not exceed a pixel.
     if (count < 0)
+    {
         return;
+    }
 
 #ifdef RANGECHECK
     if ((unsigned)dc_x >= SCREENWIDTH || dc_yl < 0 || dc_yh >= SCREENHEIGHT)
+    {
         I_Error("R_DrawColumn: %i to %i at %i", dc_yl, dc_yh, dc_x);
+    }
 #endif
 
     // Framebuffer destination address.
@@ -209,7 +212,9 @@ void R_DrawColumnLow(void)
 
     // Zero length.
     if (count < 0)
+    {
         return;
+    }
 
 #ifdef RANGECHECK
     if ((unsigned)dc_x >= SCREENWIDTH || dc_yl < 0 || dc_yh >= SCREENHEIGHT)
@@ -245,15 +250,14 @@ void R_DrawColumnLow(void)
 #define FUZZTABLE 50
 #define FUZZOFF (SCREENWIDTH)
 
-int fuzzoffset[FUZZTABLE] =
-    {
-        FUZZOFF, -FUZZOFF, FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF,
-        FUZZOFF, FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF,
-        FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF, -FUZZOFF, -FUZZOFF, -FUZZOFF,
-        FUZZOFF, -FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF,
-        FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF, -FUZZOFF, FUZZOFF,
-        FUZZOFF, -FUZZOFF, -FUZZOFF, -FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF,
-        FUZZOFF, FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF, FUZZOFF};
+int fuzzoffset[FUZZTABLE] = {
+    FUZZOFF, -FUZZOFF, FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF,
+    FUZZOFF, FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF,
+    FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF, -FUZZOFF, -FUZZOFF, -FUZZOFF,
+    FUZZOFF, -FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF,
+    FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF, -FUZZOFF, FUZZOFF,
+    FUZZOFF, -FUZZOFF, -FUZZOFF, -FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF,
+    FUZZOFF, FUZZOFF, -FUZZOFF, FUZZOFF, FUZZOFF, -FUZZOFF, FUZZOFF};
 
 int fuzzpos = 0;
 
@@ -274,23 +278,28 @@ void R_DrawFuzzColumn(void)
 
     // Adjust borders. Low...
     if (!dc_yl)
+    {
         dc_yl = 1;
+    }
 
     // .. and high.
     if (dc_yh == viewheight - 1)
+    {
         dc_yh = viewheight - 2;
+    }
 
     count = dc_yh - dc_yl;
 
     // Zero length.
     if (count < 0)
+    {
         return;
+    }
 
 #ifdef RANGECHECK
     if ((unsigned)dc_x >= SCREENWIDTH || dc_yl < 0 || dc_yh >= SCREENHEIGHT)
     {
-        I_Error("R_DrawFuzzColumn: %i to %i at %i",
-                dc_yl, dc_yh, dc_x);
+        I_Error("R_DrawFuzzColumn: %i to %i at %i", dc_yl, dc_yh, dc_x);
     }
 #endif
 
@@ -338,7 +347,9 @@ void R_DrawFuzzColumn(void)
 
         // Clamp table lookup index.
         if (++fuzzpos == FUZZTABLE)
+        {
             fuzzpos = 0;
+        }
 
         dest += SCREENWIDTH;
 
@@ -367,13 +378,14 @@ void R_DrawTranslatedColumn(void)
 
     count = dc_yh - dc_yl;
     if (count < 0)
+    {
         return;
+    }
 
 #ifdef RANGECHECK
     if ((unsigned)dc_x >= SCREENWIDTH || dc_yl < 0 || dc_yh >= SCREENHEIGHT)
     {
-        I_Error("R_DrawColumn: %i to %i at %i",
-                dc_yl, dc_yh, dc_x);
+        I_Error("R_DrawColumn: %i to %i at %i", dc_yl, dc_yh, dc_x);
     }
 
 #endif
@@ -492,8 +504,7 @@ void R_DrawSpan(void)
 #ifdef RANGECHECK
     if (ds_x2 < ds_x1 || ds_x1 < 0 || ds_x2 >= SCREENWIDTH || (unsigned)ds_y > SCREENHEIGHT)
     {
-        I_Error("R_DrawSpan: %i to %i at %i",
-                ds_x1, ds_x2, ds_y);
+        I_Error("R_DrawSpan: %i to %i at %i", ds_x1, ds_x2, ds_y);
     }
 //	dscount++;
 #endif
@@ -608,8 +619,7 @@ void R_DrawSpanLow(void)
 #ifdef RANGECHECK
     if (ds_x2 < ds_x1 || ds_x1 < 0 || ds_x2 >= SCREENWIDTH || (unsigned)ds_y > SCREENHEIGHT)
     {
-        I_Error("R_DrawSpan: %i to %i at %i",
-                ds_x1, ds_x2, ds_y);
+        I_Error("R_DrawSpan: %i to %i at %i", ds_x1, ds_x2, ds_y);
     }
 //	dscount++;
 #endif
@@ -645,8 +655,7 @@ void R_DrawSpanLow(void)
 //  for getting the framebuffer address
 //  of a pixel to draw.
 //
-void R_InitBuffer(int width,
-                  int height)
+void R_InitBuffer(int width, int height)
 {
     int i;
 
@@ -657,17 +666,25 @@ void R_InitBuffer(int width,
 
     // Column offset. For windows.
     for (i = 0; i < width; i++)
+    {
         columnofs[i] = viewwindowx + i;
+    }
 
     // Samw with base row offset.
     if (width == SCREENWIDTH)
+    {
         viewwindowy = 0;
+    }
     else
+    {
         viewwindowy = (SCREENHEIGHT - SBARHEIGHT - height) >> 1;
+    }
 
     // Preclaculate all row offsets.
     for (i = 0; i < height; i++)
+    {
         ylookup[i] = screens[0] + (i + viewwindowy) * SCREENWIDTH;
+    }
 }
 
 //
@@ -693,12 +710,18 @@ void R_FillBackScreen(void)
     char *name;
 
     if (scaledviewwidth == 320)
+    {
         return;
+    }
 
     if (gamemode == commercial)
+    {
         name = name2;
+    }
     else
+    {
         name = name1;
+    }
 
     src = (byte *)W_CacheLumpName(name, PU_CACHE);
     dest = screens[1];
@@ -721,47 +744,42 @@ void R_FillBackScreen(void)
     patch = (patch_t *)W_CacheLumpName("brdr_t", PU_CACHE);
 
     for (x = 0; x < scaledviewwidth; x += 8)
+    {
         V_DrawPatch(viewwindowx + x, viewwindowy - 8, 1, patch);
+    }
     patch = (patch_t *)W_CacheLumpName("brdr_b", PU_CACHE);
 
     for (x = 0; x < scaledviewwidth; x += 8)
+    {
         V_DrawPatch(viewwindowx + x, viewwindowy + viewheight, 1, patch);
+    }
     patch = (patch_t *)W_CacheLumpName("brdr_l", PU_CACHE);
 
     for (y = 0; y < viewheight; y += 8)
+    {
         V_DrawPatch(viewwindowx - 8, viewwindowy + y, 1, patch);
+    }
     patch = (patch_t *)W_CacheLumpName("brdr_r", PU_CACHE);
 
     for (y = 0; y < viewheight; y += 8)
+    {
         V_DrawPatch(viewwindowx + scaledviewwidth, viewwindowy + y, 1, patch);
+    }
 
     // Draw beveled edge.
-    V_DrawPatch(viewwindowx - 8,
-                viewwindowy - 8,
-                1,
-                (patch_t *)W_CacheLumpName("brdr_tl", PU_CACHE));
+    V_DrawPatch(viewwindowx - 8, viewwindowy - 8, 1, (patch_t *)W_CacheLumpName("brdr_tl", PU_CACHE));
 
-    V_DrawPatch(viewwindowx + scaledviewwidth,
-                viewwindowy - 8,
-                1,
-                (patch_t *)W_CacheLumpName("brdr_tr", PU_CACHE));
+    V_DrawPatch(viewwindowx + scaledviewwidth, viewwindowy - 8, 1, (patch_t *)W_CacheLumpName("brdr_tr", PU_CACHE));
 
-    V_DrawPatch(viewwindowx - 8,
-                viewwindowy + viewheight,
-                1,
-                (patch_t *)W_CacheLumpName("brdr_bl", PU_CACHE));
+    V_DrawPatch(viewwindowx - 8, viewwindowy + viewheight, 1, (patch_t *)W_CacheLumpName("brdr_bl", PU_CACHE));
 
-    V_DrawPatch(viewwindowx + scaledviewwidth,
-                viewwindowy + viewheight,
-                1,
-                (patch_t *)W_CacheLumpName("brdr_br", PU_CACHE));
+    V_DrawPatch(viewwindowx + scaledviewwidth, viewwindowy + viewheight, 1, (patch_t *)W_CacheLumpName("brdr_br", PU_CACHE));
 }
 
 //
 // Copy a screen buffer.
 //
-void R_VideoErase(unsigned ofs,
-                  int count)
+void R_VideoErase(unsigned ofs, int count)
 {
     // LFB copy.
     // This might not be a good idea if memcpy
@@ -776,10 +794,7 @@ void R_VideoErase(unsigned ofs,
 // Draws the border around the view
 //  for different size windows?
 //
-void V_MarkRect(int x,
-                int y,
-                int width,
-                int height);
+void V_MarkRect(int x, int y, int width, int height);
 
 void R_DrawViewBorder(void)
 {
@@ -789,7 +804,9 @@ void R_DrawViewBorder(void)
     int i;
 
     if (scaledviewwidth == SCREENWIDTH)
+    {
         return;
+    }
 
     top = ((SCREENHEIGHT - SBARHEIGHT) - viewheight) / 2;
     side = (SCREENWIDTH - scaledviewwidth) / 2;

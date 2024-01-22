@@ -21,8 +21,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-	rcsid[] = "$Id: p_floor.c,v 1.4 1997/02/03 16:47:54 b1 Exp $";
+static const char rcsid[] = "$Id: p_floor.c,v 1.4 1997/02/03 16:47:54 b1 Exp $";
 
 #include "z_zone.H"
 #include "doomdef.H"
@@ -43,13 +42,7 @@ static const char
 //
 // Move a plane (floor or ceiling) and check for crushing
 //
-result_e
-T_MovePlane(sector_t *sector,
-			fixed_t speed,
-			fixed_t dest,
-			boolean crush,
-			int floorOrCeiling,
-			int direction)
+result_e T_MovePlane(sector_t *sector, fixed_t speed, fixed_t dest, boolean crush, int floorOrCeiling, int direction)
 {
 	boolean flag;
 	fixed_t lastpos;
@@ -113,7 +106,9 @@ T_MovePlane(sector_t *sector,
 				if (flag == true)
 				{
 					if (crush == true)
+					{
 						return crushed;
+					}
 					sector->floorheight = lastpos;
 					P_ChangeSector(sector, crush);
 					return crushed;
@@ -153,7 +148,9 @@ T_MovePlane(sector_t *sector,
 				if (flag == true)
 				{
 					if (crush == true)
+					{
 						return crushed;
+					}
 					sector->ceilingheight = lastpos;
 					P_ChangeSector(sector, crush);
 					return crushed;
@@ -205,14 +202,12 @@ void T_MoveFloor(floormove_t *floor)
 {
 	result_e res;
 
-	res = T_MovePlane(floor->sector,
-					  floor->speed,
-					  floor->floordestheight,
-					  floor->crush, 0, floor->direction);
+	res = T_MovePlane(floor->sector, floor->speed, floor->floordestheight, floor->crush, 0, floor->direction);
 
 	if (!(leveltime & 7))
-		S_StartSound((mobj_t *)&floor->sector->soundorg,
-					 sfx_stnmov);
+	{
+		S_StartSound((mobj_t *)&floor->sector->soundorg, sfx_stnmov);
+	}
 
 	if (res == pastdest)
 	{
@@ -242,16 +237,14 @@ void T_MoveFloor(floormove_t *floor)
 		}
 		P_RemoveThinker(&floor->thinker);
 
-		S_StartSound((mobj_t *)&floor->sector->soundorg,
-					 sfx_pstop);
+		S_StartSound((mobj_t *)&floor->sector->soundorg, sfx_pstop);
 	}
 }
 
 //
 // HANDLE FLOOR TYPES
 //
-int EV_DoFloor(line_t *line,
-			   floor_e floortype)
+int EV_DoFloor(line_t *line, floor_e floortype)
 {
 	int secnum;
 	int rtn;
@@ -267,7 +260,9 @@ int EV_DoFloor(line_t *line,
 
 		// ALREADY MOVING?  IF SO, KEEP GOING...
 		if (sec->specialdata)
+		{
 			continue;
+		}
 
 		// new floor thinker
 		rtn = 1;
@@ -284,26 +279,25 @@ int EV_DoFloor(line_t *line,
 			floor->direction = -1;
 			floor->sector = sec;
 			floor->speed = FLOORSPEED;
-			floor->floordestheight =
-				P_FindHighestFloorSurrounding(sec);
+			floor->floordestheight = P_FindHighestFloorSurrounding(sec);
 			break;
 
 		case lowerFloorToLowest:
 			floor->direction = -1;
 			floor->sector = sec;
 			floor->speed = FLOORSPEED;
-			floor->floordestheight =
-				P_FindLowestFloorSurrounding(sec);
+			floor->floordestheight = P_FindLowestFloorSurrounding(sec);
 			break;
 
 		case turboLower:
 			floor->direction = -1;
 			floor->sector = sec;
 			floor->speed = FLOORSPEED * 4;
-			floor->floordestheight =
-				P_FindHighestFloorSurrounding(sec);
+			floor->floordestheight = P_FindHighestFloorSurrounding(sec);
 			if (floor->floordestheight != sec->floorheight)
+			{
 				floor->floordestheight += 8 * FRACUNIT;
+			}
 			break;
 
 		case raiseFloorCrush:
@@ -312,51 +306,46 @@ int EV_DoFloor(line_t *line,
 			floor->direction = 1;
 			floor->sector = sec;
 			floor->speed = FLOORSPEED;
-			floor->floordestheight =
-				P_FindLowestCeilingSurrounding(sec);
+			floor->floordestheight = P_FindLowestCeilingSurrounding(sec);
 			if (floor->floordestheight > sec->ceilingheight)
+			{
 				floor->floordestheight = sec->ceilingheight;
-			floor->floordestheight -= (8 * FRACUNIT) *
-									  (floortype == raiseFloorCrush);
+			}
+			floor->floordestheight -= (8 * FRACUNIT) * (floortype == raiseFloorCrush);
 			break;
 
 		case raiseFloorTurbo:
 			floor->direction = 1;
 			floor->sector = sec;
 			floor->speed = FLOORSPEED * 4;
-			floor->floordestheight =
-				P_FindNextHighestFloor(sec, sec->floorheight);
+			floor->floordestheight = P_FindNextHighestFloor(sec, sec->floorheight);
 			break;
 
 		case raiseFloorToNearest:
 			floor->direction = 1;
 			floor->sector = sec;
 			floor->speed = FLOORSPEED;
-			floor->floordestheight =
-				P_FindNextHighestFloor(sec, sec->floorheight);
+			floor->floordestheight = P_FindNextHighestFloor(sec, sec->floorheight);
 			break;
 
 		case raiseFloor24:
 			floor->direction = 1;
 			floor->sector = sec;
 			floor->speed = FLOORSPEED;
-			floor->floordestheight = floor->sector->floorheight +
-									 24 * FRACUNIT;
+			floor->floordestheight = floor->sector->floorheight + 24 * FRACUNIT;
 			break;
 		case raiseFloor512:
 			floor->direction = 1;
 			floor->sector = sec;
 			floor->speed = FLOORSPEED;
-			floor->floordestheight = floor->sector->floorheight +
-									 512 * FRACUNIT;
+			floor->floordestheight = floor->sector->floorheight + 512 * FRACUNIT;
 			break;
 
 		case raiseFloor24AndChange:
 			floor->direction = 1;
 			floor->sector = sec;
 			floor->speed = FLOORSPEED;
-			floor->floordestheight = floor->sector->floorheight +
-									 24 * FRACUNIT;
+			floor->floordestheight = floor->sector->floorheight + 24 * FRACUNIT;
 			sec->floorpic = line->frontsector->floorpic;
 			sec->special = line->frontsector->special;
 			break;
@@ -375,20 +364,23 @@ int EV_DoFloor(line_t *line,
 				{
 					side = getSide(secnum, i, 0);
 					if (side->bottomtexture >= 0)
-						if (textureheight[side->bottomtexture] <
-							minsize)
-							minsize =
-								textureheight[side->bottomtexture];
+					{
+						if (textureheight[side->bottomtexture] < minsize)
+						{
+							minsize = textureheight[side->bottomtexture];
+						}
+					}
 					side = getSide(secnum, i, 1);
 					if (side->bottomtexture >= 0)
-						if (textureheight[side->bottomtexture] <
-							minsize)
-							minsize =
-								textureheight[side->bottomtexture];
+					{
+						if (textureheight[side->bottomtexture] < minsize)
+						{
+							minsize = textureheight[side->bottomtexture];
+						}
+					}
 				}
 			}
-			floor->floordestheight =
-				floor->sector->floorheight + minsize;
+			floor->floordestheight = floor->sector->floorheight + minsize;
 		}
 		break;
 
@@ -396,8 +388,7 @@ int EV_DoFloor(line_t *line,
 			floor->direction = -1;
 			floor->sector = sec;
 			floor->speed = FLOORSPEED;
-			floor->floordestheight =
-				P_FindLowestFloorSurrounding(sec);
+			floor->floordestheight = P_FindLowestFloorSurrounding(sec);
 			floor->texture = sec->floorpic;
 
 			for (i = 0; i < sec->linecount; i++)
@@ -438,8 +429,7 @@ int EV_DoFloor(line_t *line,
 //
 // BUILD A STAIRCASE!
 //
-int EV_BuildStairs(line_t *line,
-				   stair_e type)
+int EV_BuildStairs(line_t *line, stair_e type)
 {
 	int secnum;
 	int height;
@@ -465,7 +455,9 @@ int EV_BuildStairs(line_t *line,
 
 		// ALREADY MOVING?  IF SO, KEEP GOING...
 		if (sec->specialdata)
+		{
 			continue;
+		}
 
 		// new floor thinker
 		rtn = 1;
@@ -501,24 +493,32 @@ int EV_BuildStairs(line_t *line,
 			for (i = 0; i < sec->linecount; i++)
 			{
 				if (!((sec->lines[i])->flags & ML_TWOSIDED))
+				{
 					continue;
+				}
 
 				tsec = (sec->lines[i])->frontsector;
 				newsecnum = tsec - sectors;
 
 				if (secnum != newsecnum)
+				{
 					continue;
+				}
 
 				tsec = (sec->lines[i])->backsector;
 				newsecnum = tsec - sectors;
 
 				if (tsec->floorpic != texture)
+				{
 					continue;
+				}
 
 				height += stairsize;
 
 				if (tsec->specialdata)
+				{
 					continue;
+				}
 
 				sec = tsec;
 				secnum = newsecnum;

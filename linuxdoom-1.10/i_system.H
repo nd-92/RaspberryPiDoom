@@ -76,10 +76,7 @@ void I_Quit(void);
 // just mallocs under unix
 byte *I_AllocLow(const size_t length);
 
-void I_Tactile(
-    __attribute__((unused)) int on,
-    __attribute__((unused)) int off,
-    __attribute__((unused)) int total);
+void I_Tactile(__attribute__((unused)) int on, __attribute__((unused)) int off, __attribute__((unused)) int total);
 // void I_Tactile(int total);
 
 void I_Error(const char *error, ...);

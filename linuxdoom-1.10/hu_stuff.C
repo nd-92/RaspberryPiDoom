@@ -20,8 +20,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-    rcsid[] = "$Id: hu_stuff.c,v 1.4 1997/02/03 16:47:52 b1 Exp $";
+static const char rcsid[] = "$Id: hu_stuff.c,v 1.4 1997/02/03 16:47:52 b1 Exp $";
 
 #include <ctype.h>
 
@@ -383,9 +382,13 @@ void HU_Init(void)
     char buffer[9];
 
     if (french)
+    {
         shiftxform = french_shiftxform;
+    }
     else
+    {
         shiftxform = english_shiftxform;
+    }
 
     // load the heads-up font
     j = HU_FONTSTART;
@@ -408,7 +411,9 @@ void HU_Start(void)
     char *s;
 
     if (headsupactive)
+    {
         HU_Stop();
+    }
 
     plr = &players[consoleplayer];
     message_on = false;
@@ -417,16 +422,10 @@ void HU_Start(void)
     chat_on = false;
 
     // create the message widget
-    HUlib_initSText(&w_message,
-                    HU_MSGX, HU_MSGY, HU_MSGHEIGHT,
-                    hu_font,
-                    HU_FONTSTART, &message_on);
+    HUlib_initSText(&w_message, HU_MSGX, HU_MSGY, HU_MSGHEIGHT, hu_font, HU_FONTSTART, &message_on);
 
     // create the map title widget
-    HUlib_initTextLine(&w_title,
-                       HU_TITLEX, HU_TITLEY,
-                       hu_font,
-                       HU_FONTSTART);
+    HUlib_initTextLine(&w_title, HU_TITLEX, HU_TITLEY, hu_font, HU_FONTSTART);
 
     switch (gamemode)
     {
@@ -452,17 +451,18 @@ void HU_Start(void)
     }
 
     while (*s)
+    {
         HUlib_addCharToTextLine(&w_title, *(s++));
+    }
 
     // create the chat widget
-    HUlib_initIText(&w_chat,
-                    HU_INPUTX, HU_INPUTY,
-                    hu_font,
-                    HU_FONTSTART, &chat_on);
+    HUlib_initIText(&w_chat, HU_INPUTX, HU_INPUTY, hu_font, HU_FONTSTART, &chat_on);
 
     // create the inputbuffer widgets
     for (i = 0; i < MAXPLAYERS; i++)
+    {
         HUlib_initIText(&w_inputbuffer[i], 0, 0, 0, 0, &always_off);
+    }
 
     headsupactive = true;
 }
@@ -473,7 +473,9 @@ void HU_Drawer(void)
     HUlib_drawSText(&w_message);
     HUlib_drawIText(&w_chat);
     if (automapactive)
+    {
         HUlib_drawTextLine(&w_title, false);
+    }
 }
 
 void HU_Erase(void)
@@ -519,31 +521,39 @@ void HU_Ticker(void)
         for (i = 0; i < MAXPLAYERS; i++)
         {
             if (!playeringame[i])
+            {
                 continue;
+            }
             if (i != consoleplayer && (c = players[i].cmd.chatchar))
             {
                 if (c <= HU_BROADCAST)
+                {
                     chat_dest[i] = c;
+                }
                 else
                 {
                     if (c >= 'a' && c <= 'z')
+                    {
                         c = (char)shiftxform[(unsigned char)c];
+                    }
                     rc = HUlib_keyInIText(&w_inputbuffer[i], c);
                     if (rc && c == KEY_ENTER)
                     {
                         if (w_inputbuffer[i].l.len && (chat_dest[i] == consoleplayer + 1 || chat_dest[i] == HU_BROADCAST))
                         {
-                            HUlib_addMessageToSText(&w_message,
-                                                    player_names[i],
-                                                    w_inputbuffer[i].l.l);
+                            HUlib_addMessageToSText(&w_message, player_names[i], w_inputbuffer[i].l.l);
 
                             message_nottobefuckedwith = true;
                             message_on = true;
                             message_counter = HU_MSGTIMEOUT;
                             if (gamemode == commercial)
+                            {
                                 S_StartSound(0, sfx_radio);
+                            }
                             else
+                            {
                                 S_StartSound(0, sfx_tink);
+                            }
                         }
                         HUlib_resetIText(&w_inputbuffer[i]);
                     }
@@ -613,7 +623,9 @@ boolean HU_Responder(event_t *ev)
 
     numplayers = 0;
     for (i = 0; i < MAXPLAYERS; i++)
+    {
         numplayers += playeringame[i];
+    }
 
     if (ev->data1 == KEY_RSHIFT)
     {
@@ -627,7 +639,9 @@ boolean HU_Responder(event_t *ev)
     }
 
     if (ev->type != ev_keydown)
+    {
         return false;
+    }
 
     if (!chat_on)
     {
@@ -660,15 +674,25 @@ boolean HU_Responder(event_t *ev)
                     {
                         num_nobrainers++;
                         if (num_nobrainers < 3)
+                        {
                             plr->message = HUSTR_TALKTOSELF1;
+                        }
                         else if (num_nobrainers < 6)
+                        {
                             plr->message = HUSTR_TALKTOSELF2;
+                        }
                         else if (num_nobrainers < 9)
+                        {
                             plr->message = HUSTR_TALKTOSELF3;
+                        }
                         else if (num_nobrainers < 32)
+                        {
                             plr->message = HUSTR_TALKTOSELF4;
+                        }
                         else
+                        {
                             plr->message = HUSTR_TALKTOSELF5;
+                        }
                     }
                 }
             }
@@ -682,7 +706,9 @@ boolean HU_Responder(event_t *ev)
         {
             c = c - '0';
             if (c > 9)
+            {
                 return false;
+            }
             // fprintf(stderr, "got here\n");
             macromessage = chat_macros[c];
 
@@ -691,7 +717,9 @@ boolean HU_Responder(event_t *ev)
 
             // send the macro message
             while (*macromessage)
+            {
                 HU_queueChatChar(*macromessage++);
+            }
             HU_queueChatChar(KEY_ENTER);
 
             // leave chat mode and notify that it was sent
@@ -703,9 +731,13 @@ boolean HU_Responder(event_t *ev)
         else
         {
             if (french)
+            {
                 c = ForeignTranslation(c);
+            }
             if (shiftdown || (c >= 'a' && c <= 'z'))
+            {
                 c = shiftxform[c];
+            }
             eatkey = HUlib_keyInIText(&w_chat, c);
             if (eatkey)
             {
@@ -725,7 +757,9 @@ boolean HU_Responder(event_t *ev)
                 }
             }
             else if (c == KEY_ESCAPE)
+            {
                 chat_on = false;
+            }
         }
     }
 
