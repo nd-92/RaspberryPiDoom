@@ -24,6 +24,8 @@
 static const char
 	rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
+extern int errno;
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ipc.h>
@@ -88,7 +90,8 @@ int doPointerWarp = POINTER_WARP_COUNTDOWN;
 // replace each 320x200 pixel with multiply*multiply pixels.
 // According to Dave Taylor, it still is a bonehead thing
 // to use ....
-static int multiply = 1;
+// static int multiply = 1;
+static unsigned int multiply = 1;
 
 //
 //  Translates the key currently in X_event
@@ -546,12 +549,12 @@ void I_FinishUpdate(void)
 			olineptrs[2] += 2 * X_width / 4;
 		}
 	}
-	else if (multiply == 4)
-	{
-		// Broken. Gotta fix this some day.
-		void Expand4(byte *, char *);
-		Expand4(screens[0], image->data);
-	}
+	// else if (multiply == 4)
+	// {
+	// 	// Broken. Gotta fix this some day.
+	// 	void Expand4(byte *, char *);
+	// 	Expand4(screens[0], image->data);
+	// }
 
 	if (doShm)
 	{
@@ -733,7 +736,7 @@ void grabsharedmemory(size_t size)
 			id = shmget((key_t)key, size, IPC_CREAT | 0777);
 			if (id == -1)
 			{
-				extern int errno;
+				// extern int errno;
 				fprintf(stderr, "errno=%d\n", errno);
 				I_Error("Could not get any shared memory");
 			}
@@ -774,7 +777,7 @@ void I_InitGraphics(void)
 	unsigned long attribmask;
 	XSetWindowAttributes attribs;
 	XGCValues xgcvalues;
-	int valuemask;
+	long unsigned int valuemask;
 	static int firsttime = 1;
 
 	if (!firsttime)
@@ -934,7 +937,7 @@ void I_InitGraphics(void)
 								X_width,
 								X_height);
 
-		grabsharedmemory(image->bytes_per_line * image->height);
+		grabsharedmemory(static_cast<size_t>(image->bytes_per_line * image->height));
 
 		// UNUSED
 		// create the shared memory segment
@@ -969,7 +972,7 @@ void I_InitGraphics(void)
 							 (char *)malloc(X_width * X_height),
 							 X_width, X_height,
 							 8,
-							 X_width);
+							 static_cast<int>(X_width));
 	}
 
 	if (multiply == 1)
@@ -982,18 +985,16 @@ unsigned exptable[256];
 
 void InitExpand(void)
 {
-	int i;
-
-	for (i = 0; i < 256; i++)
+	for (unsigned int i = 0; i < 256; i++)
+	{
 		exptable[i] = i | (i << 8) | (i << 16) | (i << 24);
+	}
 }
 
 double exptable2[256 * 256];
 
 void InitExpand2(void)
 {
-	int i;
-	int j;
 	// UNUSED unsigned	iexp, jexp;
 	double *exp;
 	union
@@ -1004,10 +1005,10 @@ void InitExpand2(void)
 
 	printf("building exptable2...\n");
 	exp = exptable2;
-	for (i = 0; i < 256; i++)
+	for (unsigned int i = 0; i < 256; i++)
 	{
 		pixel.u[0] = i | (i << 8) | (i << 16) | (i << 24);
-		for (j = 0; j < 256; j++)
+		for (unsigned int j = 0; j < 256; j++)
 		{
 			pixel.u[1] = j | (j << 8) | (j << 16) | (j << 24);
 			*exp++ = pixel.d;
@@ -1018,91 +1019,91 @@ void InitExpand2(void)
 
 int inited;
 
-void Expand4(byte *lineptr,
-			 char *xline)
-{
-	double dpixel;
-	unsigned x;
-	unsigned y;
-	unsigned fourpixels;
-	unsigned step;
-	double *exp;
+// void Expand4(byte *lineptr,
+// 			 char *xline)
+// {
+// 	double dpixel;
+// 	unsigned x;
+// 	unsigned y;
+// 	unsigned fourpixels;
+// 	unsigned step;
+// 	double *exp;
 
-	exp = exptable2;
-	if (!inited)
-	{
-		inited = 1;
-		InitExpand2();
-	}
+// 	exp = exptable2;
+// 	if (!inited)
+// 	{
+// 		inited = 1;
+// 		InitExpand2();
+// 	}
 
-	step = 3 * SCREENWIDTH / 2;
+// 	step = 3 * SCREENWIDTH / 2;
 
-	y = SCREENHEIGHT - 1;
-	do
-	{
-		x = SCREENWIDTH;
+// 	y = SCREENHEIGHT - 1;
+// 	do
+// 	{
+// 		x = SCREENWIDTH;
 
-		do
-		{
-			fourpixels = lineptr[0];
+// 		do
+// 		{
+// 			fourpixels = lineptr[0];
 
-			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff0000) >> 13));
-			xline[0] = dpixel;
-			xline[160] = dpixel;
-			xline[320] = dpixel;
-			xline[480] = dpixel;
+// 			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff0000) >> 13));
+// 			xline[0] = dpixel;
+// 			xline[160] = dpixel;
+// 			xline[320] = dpixel;
+// 			xline[480] = dpixel;
 
-			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff) << 3));
-			xline[1] = dpixel;
-			xline[161] = dpixel;
-			xline[321] = dpixel;
-			xline[481] = dpixel;
+// 			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff) << 3));
+// 			xline[1] = dpixel;
+// 			xline[161] = dpixel;
+// 			xline[321] = dpixel;
+// 			xline[481] = dpixel;
 
-			fourpixels = lineptr[1];
+// 			fourpixels = lineptr[1];
 
-			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff0000) >> 13));
-			xline[2] = dpixel;
-			xline[162] = dpixel;
-			xline[322] = dpixel;
-			xline[482] = dpixel;
+// 			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff0000) >> 13));
+// 			xline[2] = dpixel;
+// 			xline[162] = dpixel;
+// 			xline[322] = dpixel;
+// 			xline[482] = dpixel;
 
-			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff) << 3));
-			xline[3] = dpixel;
-			xline[163] = dpixel;
-			xline[323] = dpixel;
-			xline[483] = dpixel;
+// 			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff) << 3));
+// 			xline[3] = dpixel;
+// 			xline[163] = dpixel;
+// 			xline[323] = dpixel;
+// 			xline[483] = dpixel;
 
-			fourpixels = lineptr[2];
+// 			fourpixels = lineptr[2];
 
-			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff0000) >> 13));
-			xline[4] = dpixel;
-			xline[164] = dpixel;
-			xline[324] = dpixel;
-			xline[484] = dpixel;
+// 			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff0000) >> 13));
+// 			xline[4] = dpixel;
+// 			xline[164] = dpixel;
+// 			xline[324] = dpixel;
+// 			xline[484] = dpixel;
 
-			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff) << 3));
-			xline[5] = dpixel;
-			xline[165] = dpixel;
-			xline[325] = dpixel;
-			xline[485] = dpixel;
+// 			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff) << 3));
+// 			xline[5] = dpixel;
+// 			xline[165] = dpixel;
+// 			xline[325] = dpixel;
+// 			xline[485] = dpixel;
 
-			fourpixels = lineptr[3];
+// 			fourpixels = lineptr[3];
 
-			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff0000) >> 13));
-			xline[6] = dpixel;
-			xline[166] = dpixel;
-			xline[326] = dpixel;
-			xline[486] = dpixel;
+// 			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff0000) >> 13));
+// 			xline[6] = dpixel;
+// 			xline[166] = dpixel;
+// 			xline[326] = dpixel;
+// 			xline[486] = dpixel;
 
-			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff) << 3));
-			xline[7] = dpixel;
-			xline[167] = dpixel;
-			xline[327] = dpixel;
-			xline[487] = dpixel;
+// 			dpixel = *(double *)((int)exp + ((fourpixels & 0xffff) << 3));
+// 			xline[7] = dpixel;
+// 			xline[167] = dpixel;
+// 			xline[327] = dpixel;
+// 			xline[487] = dpixel;
 
-			lineptr += 4;
-			xline += 8;
-		} while (x -= 16);
-		xline += step;
-	} while (y--);
-}
+// 			lineptr += 4;
+// 			xline += 8;
+// 		} while (x -= 16);
+// 		xline += step;
+// 	} while (y--);
+// }

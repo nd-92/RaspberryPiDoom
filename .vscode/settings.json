@@ -56,6 +56,10 @@
         "rho_0": "OpenFOAM",
         "p_0": "OpenFOAM",
         "delta": "OpenFOAM",
-        "am_map.C": "cpp"
+        "am_map.C": "cpp",
+        "i_system.C": "cpp",
+        "p_inter.C": "cpp",
+        "i_video.C": "cpp",
+        "m_argv.C": "cpp"
     }
 }

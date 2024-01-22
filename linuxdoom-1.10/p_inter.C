@@ -21,8 +21,7 @@
 //
 //-----------------------------------------------------------------------------
 
-static const char
-	rcsid[] = "$Id: p_inter.c,v 1.4 1997/02/03 22:45:11 b1 Exp $";
+static const char rcsid[] = "$Id: p_inter.c,v 1.4 1997/02/03 22:45:11 b1 Exp $";
 
 // Data.
 #include "doomdef.H"
@@ -821,13 +820,9 @@ void P_DamageMobj(mobj_t *target,
 		temp = damage < 100 ? damage : 100;
 
 		if (player == &players[consoleplayer])
-		// I_Tactile(40, 10, 40 + temp * 2);
-		// {
-		// 	I_Tactile(40 + temp * 2);
-		// }
-		// {
-		// 	temp = 0;
-		// }
+		{
+			I_Tactile(40, 10, 40 + temp * 2);
+		}
 	}
 
 	// do the damage

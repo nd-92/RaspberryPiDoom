@@ -46,13 +46,13 @@ static const char
 
 const size_t mb_used = 6;
 
-// void I_Tactile(int on,
-//                int off,
-//                int total)
-// void I_Tactile(int total)
-// {
-//     total = 0;
-// }
+void I_Tactile(
+    __attribute__((unused)) int on,
+    __attribute__((unused)) int off,
+    __attribute__((unused)) int total)
+{
+    total = 0;
+}
 
 ticcmd_t emptycmd;
 ticcmd_t *I_BaseTiccmd(void)
