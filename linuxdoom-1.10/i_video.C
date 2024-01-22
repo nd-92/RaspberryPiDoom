@@ -36,9 +36,9 @@ static const char
 #include <X11/extensions/XShm.h>
 // Had to dig up XShm.c for this one.
 // It is in the libXext, but not in the XFree86 headers.
-#ifdef LINUX
-int XShmGetEventBase(Display *dpy); // problems with g++?
-#endif
+// #ifdef LINUX
+// int XShmGetEventBase(Display *dpy); // problems with g++?
+// #endif
 
 #include <stdarg.h>
 #include <sys/time.h>
@@ -69,8 +69,8 @@ XEvent X_event;
 int X_screen;
 XVisualInfo X_visualinfo;
 XImage *image;
-int X_width;
-int X_height;
+unsigned int X_width;
+unsigned int X_height;
 
 // MIT SHared Memory extension.
 boolean doShm;
@@ -94,12 +94,21 @@ static int multiply = 1;
 //  Translates the key currently in X_event
 //
 
-int xlatekey(void)
+unsigned int xlatekey(void)
 {
 
-	int rc;
+	// int rc = XKeycodeToKeysym(X_display, X_event.xkey.keycode, 0);
 
-	switch (rc = XKeycodeToKeysym(X_display, X_event.xkey.keycode, 0))
+	int keysyms_per_keycode_return;
+	KeySym *keysym = XGetKeyboardMapping(
+		X_display,
+		static_cast<KeyCode>(X_event.xkey.keycode),
+		1,
+		&keysyms_per_keycode_return);
+
+	unsigned int rc = static_cast<unsigned int>(*keysym);
+
+	switch (rc)
 	{
 	case XK_Left:
 		rc = KEY_LEFTARROW;
@@ -203,6 +212,8 @@ int xlatekey(void)
 		break;
 	}
 
+	XFree(keysym);
+
 	return rc;
 }
 
@@ -256,27 +267,39 @@ void I_GetEvent(void)
 		break;
 	case ButtonPress:
 		event.type = ev_mouse;
-		event.data1 =
-			(X_event.xbutton.state & Button1Mask) | (X_event.xbutton.state & Button2Mask ? 2 : 0) | (X_event.xbutton.state & Button3Mask ? 4 : 0) | (X_event.xbutton.button == Button1) | (X_event.xbutton.button == Button2 ? 2 : 0) | (X_event.xbutton.button == Button3 ? 4 : 0);
+		event.data1 =										//
+			(X_event.xbutton.state & Button1Mask)			//
+			| (X_event.xbutton.state & Button2Mask ? 2 : 0) //
+			| (X_event.xbutton.state & Button3Mask ? 4 : 0) //
+			| (X_event.xbutton.button == Button1)			//
+			| (X_event.xbutton.button == Button2 ? 2 : 0)	//
+			| (X_event.xbutton.button == Button3 ? 4 : 0);	//
 		event.data2 = event.data3 = 0;
 		D_PostEvent(&event);
 		// fprintf(stderr, "b");
 		break;
 	case ButtonRelease:
 		event.type = ev_mouse;
-		event.data1 =
-			(X_event.xbutton.state & Button1Mask) | (X_event.xbutton.state & Button2Mask ? 2 : 0) | (X_event.xbutton.state & Button3Mask ? 4 : 0);
+		event.data1 =										 //
+			(X_event.xbutton.state & Button1Mask)			 //
+			| (X_event.xbutton.state & Button2Mask ? 2 : 0)	 //
+			| (X_event.xbutton.state & Button3Mask ? 4 : 0); //
 		// suggest parentheses around arithmetic in operand of |
-		event.data1 =
-			event.data1 ^ (X_event.xbutton.button == Button1 ? 1 : 0) ^ (X_event.xbutton.button == Button2 ? 2 : 0) ^ (X_event.xbutton.button == Button3 ? 4 : 0);
+		event.data1 =									   //
+			event.data1									   //
+			^ (X_event.xbutton.button == Button1 ? 1 : 0)  //
+			^ (X_event.xbutton.button == Button2 ? 2 : 0)  //
+			^ (X_event.xbutton.button == Button3 ? 4 : 0); //
 		event.data2 = event.data3 = 0;
 		D_PostEvent(&event);
 		// fprintf(stderr, "bu");
 		break;
 	case MotionNotify:
 		event.type = ev_mouse;
-		event.data1 =
-			(X_event.xmotion.state & Button1Mask) | (X_event.xmotion.state & Button2Mask ? 2 : 0) | (X_event.xmotion.state & Button3Mask ? 4 : 0);
+		event.data1 =										 //
+			(X_event.xmotion.state & Button1Mask)			 //
+			| (X_event.xmotion.state & Button2Mask ? 2 : 0)	 //
+			| (X_event.xmotion.state & Button3Mask ? 4 : 0); //
 		event.data2 = (X_event.xmotion.x - lastmousex) << 2;
 		event.data3 = (lastmousey - X_event.xmotion.y) << 2;
 
@@ -284,8 +307,8 @@ void I_GetEvent(void)
 		{
 			lastmousex = X_event.xmotion.x;
 			lastmousey = X_event.xmotion.y;
-			if (X_event.xmotion.x != X_width / 2 &&
-				X_event.xmotion.y != X_height / 2)
+			if (X_event.xmotion.x != static_cast<int>(X_width) / 2 &&
+				X_event.xmotion.y != static_cast<int>(X_height) / 2)
 			{
 				D_PostEvent(&event);
 				// fprintf(stderr, "m");
@@ -355,9 +378,12 @@ void I_StartTic(void)
 			XWarpPointer(X_display,
 						 None,
 						 X_mainWindow,
-						 0, 0,
-						 0, 0,
-						 X_width / 2, X_height / 2);
+						 0,
+						 0,
+						 0,
+						 0,
+						 static_cast<int>(X_width) / 2,
+						 static_cast<int>(X_height) / 2);
 
 			doPointerWarp = POINTER_WARP_COUNTDOWN;
 		}
@@ -404,16 +430,25 @@ void I_FinishUpdate(void)
 	// scales the screen size before blitting it
 	if (multiply == 2)
 	{
-		unsigned int *olineptrs[2];
-		unsigned int *ilineptr;
-		int x, y, i;
-		unsigned int twoopixels;
-		unsigned int twomoreopixels;
-		unsigned int fouripixels;
+		// unsigned int *olineptrs[2];
+		byte *olineptrs[2];
+		// unsigned int *ilineptr;
+		byte *ilineptr;
+		int x, y, j;
+		// unsigned int twoopixels;
+		// unsigned int twomoreopixels;
+		// unsigned int fouripixels;
+		byte twoopixels;
+		byte twomoreopixels;
+		byte fouripixels;
 
-		ilineptr = (unsigned int *)(screens[0]);
-		for (i = 0; i < 2; i++)
-			olineptrs[i] = (unsigned int *)&image->data[i * X_width];
+		// ilineptr = (unsigned int *)(screens[0]);
+		ilineptr = screens[0];
+		for (j = 0; j < 2; j++)
+		{
+			// olineptrs[j] = (unsigned int *)&image->data[j * X_width];
+			olineptrs[j] = reinterpret_cast<byte *>(&image->data[j * static_cast<int>(X_width)]);
+		}
 
 		y = SCREENHEIGHT;
 		while (y--)
@@ -422,8 +457,14 @@ void I_FinishUpdate(void)
 			do
 			{
 				fouripixels = *ilineptr++;
-				twoopixels = (fouripixels & 0xff000000) | ((fouripixels >> 8) & 0xffff00) | ((fouripixels >> 16) & 0xff);
-				twomoreopixels = ((fouripixels << 16) & 0xff000000) | ((fouripixels << 8) & 0xffff00) | (fouripixels & 0xff);
+				twoopixels =											  //
+					(fouripixels & static_cast<byte>(0xff000000))		  //
+					| ((fouripixels >> 8) & static_cast<byte>(0xffff00))  //
+					| ((fouripixels >> 16) & static_cast<byte>(0xff));	  //
+				twomoreopixels =										  //
+					((fouripixels << 16) & static_cast<byte>(0xff000000)) //
+					| ((fouripixels << 8) & static_cast<byte>(0xffff00))  //
+					| (fouripixels & static_cast<byte>(0xff));			  //
 #ifdef __BIG_ENDIAN__
 				*olineptrs[0]++ = twoopixels;
 				*olineptrs[1]++ = twoopixels;
@@ -442,15 +483,22 @@ void I_FinishUpdate(void)
 	}
 	else if (multiply == 3)
 	{
-		unsigned int *olineptrs[3];
-		unsigned int *ilineptr;
-		int x, y, i;
-		unsigned int fouropixels[3];
-		unsigned int fouripixels;
+		// unsigned int *olineptrs[3];
+		// unsigned int *ilineptr;
+		byte *olineptrs[3];
+		byte *ilineptr;
+		int x, y, j;
+		// unsigned int fouropixels[3];
+		// unsigned int fouripixels;
+		byte fouropixels[3];
+		byte fouripixels;
 
-		ilineptr = (unsigned int *)(screens[0]);
-		for (i = 0; i < 3; i++)
-			olineptrs[i] = (unsigned int *)&image->data[i * X_width];
+		// ilineptr = (unsigned int *)(screens[0]);
+		ilineptr = screens[0];
+		for (j = 0; j < 3; j++)
+		{
+			olineptrs[j] = reinterpret_cast<byte *>(&image->data[j * static_cast<int>(X_width)]);
+		}
 
 		y = SCREENHEIGHT;
 		while (y--)
@@ -459,9 +507,18 @@ void I_FinishUpdate(void)
 			do
 			{
 				fouripixels = *ilineptr++;
-				fouropixels[0] = (fouripixels & 0xff000000) | ((fouripixels >> 8) & 0xff0000) | ((fouripixels >> 16) & 0xffff);
-				fouropixels[1] = ((fouripixels << 8) & 0xff000000) | (fouripixels & 0xffff00) | ((fouripixels >> 8) & 0xff);
-				fouropixels[2] = ((fouripixels << 16) & 0xffff0000) | ((fouripixels << 8) & 0xff00) | (fouripixels & 0xff);
+				fouropixels[0] =										  //
+					(fouripixels & static_cast<byte>(0xff000000))		  //
+					| ((fouripixels >> 8) & static_cast<byte>(0xff0000))  //
+					| ((fouripixels >> 16) & static_cast<byte>(0xffff));  //
+				fouropixels[1] =										  //
+					((fouripixels << 8) & static_cast<byte>(0xff000000))  //
+					| (fouripixels & static_cast<byte>(0xffff00))		  //
+					| ((fouripixels >> 8) & static_cast<byte>(0xff));	  //
+				fouropixels[2] =										  //
+					((fouripixels << 16) & static_cast<byte>(0xffff0000)) //
+					| ((fouripixels << 8) & static_cast<byte>(0xff00))	  //
+					| (fouripixels & static_cast<byte>(0xff));			  //
 #ifdef __BIG_ENDIAN__
 				*olineptrs[0]++ = fouropixels[0];
 				*olineptrs[1]++ = fouropixels[0];
@@ -492,8 +549,8 @@ void I_FinishUpdate(void)
 	else if (multiply == 4)
 	{
 		// Broken. Gotta fix this some day.
-		void Expand4(unsigned *, double *);
-		Expand4((unsigned *)(screens[0]), (double *)(image->data));
+		void Expand4(byte *, char *);
+		Expand4(screens[0], image->data);
 	}
 
 	if (doShm)
@@ -505,7 +562,8 @@ void I_FinishUpdate(void)
 						  image,
 						  0, 0,
 						  0, 0,
-						  X_width, X_height,
+						  X_width,
+						  X_height,
 						  True))
 			I_Error("XShmPutImage() failed\n");
 
@@ -549,8 +607,8 @@ static XColor colors[256];
 void UploadNewPalette(Colormap cmap, byte *palette)
 {
 
-	register int i;
-	register int c;
+	int i;
+	unsigned short c;
 	static boolean firstcall = true;
 
 #ifdef __cplusplus
@@ -565,7 +623,7 @@ void UploadNewPalette(Colormap cmap, byte *palette)
 			firstcall = false;
 			for (i = 0; i < 256; i++)
 			{
-				colors[i].pixel = i;
+				colors[i].pixel = static_cast<unsigned long>(i);
 				colors[i].flags = DoRed | DoGreen | DoBlue;
 			}
 		}
@@ -573,12 +631,12 @@ void UploadNewPalette(Colormap cmap, byte *palette)
 		// set the X colormap entries
 		for (i = 0; i < 256; i++)
 		{
-			c = gammatable[usegamma][*palette++];
-			colors[i].red = (c << 8) + c;
-			c = gammatable[usegamma][*palette++];
-			colors[i].green = (c << 8) + c;
-			c = gammatable[usegamma][*palette++];
-			colors[i].blue = (c << 8) + c;
+			c = static_cast<unsigned short>(gammatable[usegamma][*palette++]);
+			colors[i].red = static_cast<unsigned short>((c << 8) + c);
+			c = static_cast<unsigned short>(gammatable[usegamma][*palette++]);
+			colors[i].green = static_cast<unsigned short>((c << 8) + c);
+			c = static_cast<unsigned short>(gammatable[usegamma][*palette++]);
+			colors[i].blue = static_cast<unsigned short>((c << 8) + c);
 		}
 
 		// store the colors to the current colormap
@@ -601,12 +659,12 @@ void I_SetPalette(byte *palette)
 //  thus there might have been stale
 //  handles accumulating.
 //
-void grabsharedmemory(int size)
+void grabsharedmemory(size_t size)
 {
 
 	int key = ('d' << 24) | ('o' << 16) | ('o' << 8) | 'm';
 	struct shmid_ds shminfo;
-	int minsize = 320 * 200;
+	const size_t minsize = 320 * 200;
 	int id;
 	int rc;
 	// UNUSED int done=0;
@@ -960,8 +1018,8 @@ void InitExpand2(void)
 
 int inited;
 
-void Expand4(unsigned *lineptr,
-			 double *xline)
+void Expand4(byte *lineptr,
+			 char *xline)
 {
 	double dpixel;
 	unsigned x;
