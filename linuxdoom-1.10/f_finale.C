@@ -54,34 +54,34 @@ int finalecount;
 #define TEXTSPEED 3
 #define TEXTWAIT 250
 
-char *e1text = E1TEXT;
-char *e2text = E2TEXT;
-char *e3text = E3TEXT;
-char *e4text = E4TEXT;
+const char *e1text = E1TEXT;
+const char *e2text = E2TEXT;
+const char *e3text = E3TEXT;
+const char *e4text = E4TEXT;
 
-char *c1text = C1TEXT;
-char *c2text = C2TEXT;
-char *c3text = C3TEXT;
-char *c4text = C4TEXT;
-char *c5text = C5TEXT;
-char *c6text = C6TEXT;
+const char *c1text = C1TEXT;
+const char *c2text = C2TEXT;
+const char *c3text = C3TEXT;
+const char *c4text = C4TEXT;
+const char *c5text = C5TEXT;
+const char *c6text = C6TEXT;
 
-char *p1text = P1TEXT;
-char *p2text = P2TEXT;
-char *p3text = P3TEXT;
-char *p4text = P4TEXT;
-char *p5text = P5TEXT;
-char *p6text = P6TEXT;
+const char *p1text = P1TEXT;
+const char *p2text = P2TEXT;
+const char *p3text = P3TEXT;
+const char *p4text = P4TEXT;
+const char *p5text = P5TEXT;
+const char *p6text = P6TEXT;
 
-char *t1text = T1TEXT;
-char *t2text = T2TEXT;
-char *t3text = T3TEXT;
-char *t4text = T4TEXT;
-char *t5text = T5TEXT;
-char *t6text = T6TEXT;
+const char *t1text = T1TEXT;
+const char *t2text = T2TEXT;
+const char *t3text = T3TEXT;
+const char *t4text = T4TEXT;
+const char *t5text = T5TEXT;
+const char *t6text = T6TEXT;
 
-char *finaletext;
-char *finaleflat;
+const char *finaletext;
+const char *finaleflat;
 
 void F_StartCast(void);
 void F_CastTicker(void);
@@ -242,7 +242,9 @@ void F_Ticker(void)
 		return;
 	}
 
-	if (!finalestage && finalecount > strlen(finaletext) * TEXTSPEED + TEXTWAIT)
+	// Cast length of finaletext to int from size_t
+	// Don't alter signedness of finalecount or finalestage
+	if (!finalestage && finalecount > static_cast<int>(strlen(finaletext)) * TEXTSPEED + TEXTWAIT)
 	{
 		finalecount = 0;
 		finalestage = 1;
@@ -268,7 +270,7 @@ void F_TextWrite(void)
 
 	int x, y, w;
 	int count;
-	char *ch;
+	// char *ch;
 	int c;
 	int cx;
 	int cy;
@@ -296,7 +298,7 @@ void F_TextWrite(void)
 	// draw some of the text onto the screen
 	cx = 10;
 	cy = 10;
-	ch = finaletext;
+	const char *ch = finaletext;
 
 	count = (finalecount - 10) / TEXTSPEED;
 	if (count < 0)
@@ -341,7 +343,7 @@ void F_TextWrite(void)
 //
 typedef struct
 {
-	char *name;
+	const char *name;
 	mobjtype_t type;
 } castinfo_t;
 
@@ -579,16 +581,16 @@ boolean F_CastResponder(event_t *ev)
 	return true;
 }
 
-void F_CastPrint(char *text)
+void F_CastPrint(const char *text)
 {
-	char *ch;
+	// char *ch;
 	int c;
 	int cx;
 	int w;
 	int width;
 
 	// find width
-	ch = text;
+	const char *ch = text;
 	width = 0;
 
 	while (ch)

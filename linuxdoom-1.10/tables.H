@@ -38,7 +38,11 @@
 #ifdef LINUX
 #include <math.h>
 #else
-#define PI 3.141592657
+// #define PI 3.141592657
+constexpr double PI()
+{
+    return std::atan(1) * 4;
+}
 #endif
 
 #include "m_fixed.H"
@@ -77,7 +81,7 @@ extern angle_t tantoangle[SLOPERANGE + 1];
 
 // Utility function,
 //  called by R_PointToAngle.
-int SlopeDiv(unsigned num, unsigned den);
+angle_t SlopeDiv(const unsigned num, const unsigned den);
 
 #endif
 //-----------------------------------------------------------------------------

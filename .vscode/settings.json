@@ -120,6 +120,7 @@
         "z_zone.C": "cpp",
         "DOOMNET.C": "cpp",
         "PORT.C": "cpp",
-        "SERSETUP.C": "cpp"
+        "SERSETUP.C": "cpp",
+        "cmath": "cpp"
     }
 }

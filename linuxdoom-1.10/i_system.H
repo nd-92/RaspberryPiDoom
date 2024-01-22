@@ -22,6 +22,7 @@
 #ifndef __I_SYSTEM__
 #define __I_SYSTEM__
 
+#include <stddef.h>
 #include "d_ticcmd.H"
 #include "d_event.H"
 
