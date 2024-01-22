@@ -60,6 +60,10 @@
         "i_system.C": "cpp",
         "p_inter.C": "cpp",
         "i_video.C": "cpp",
-        "m_argv.C": "cpp"
+        "m_argv.C": "cpp",
+        "i_net.C": "cpp",
+        "d_net.C": "cpp",
+        "g_game.C": "cpp",
+        "m_random.C": "cpp"
     }
 }
