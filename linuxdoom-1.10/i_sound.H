@@ -55,22 +55,34 @@ void I_ShutdownSound(void);
 void I_SetChannels();
 
 // Get raw data lump index for sound descriptor.
-int I_GetSfxLumpNum(sfxinfo_t *sfxinfo);
+int I_GetSfxLumpNum(
+    const sfxinfo_t *sfxinfo);
 
 // Starts a sound in a particular sound channel.
-int I_StartSound(int id, int vol, int sep, int pitch);
+int I_StartSound(
+    const int id,
+    const int vol,
+    const int sep,
+    const int pitch,
+    __attribute__((unused)) const int priority);
 
 // Stops a sound channel.
-void I_StopSound();
+void I_StopSound(
+    __attribute__((unused)) const int handle);
 
 // Called by S_*() functions
 //  to see if a channel is still playing.
 // Returns 0 if no longer playing, 1 if playing.
-int I_SoundIsPlaying(int handle);
+int I_SoundIsPlaying(
+    const int handle);
 
 // Updates the volume, separation,
 //  and pitch of a sound channel.
-void I_UpdateSoundParams();
+void I_UpdateSoundParams(
+    __attribute__((unused)) const int handle,
+    __attribute__((unused)) const int vol,
+    __attribute__((unused)) const int sep,
+    __attribute__((unused)) const int pitch);
 
 //
 //  MUSIC I/O
@@ -80,19 +92,25 @@ void I_ShutdownMusic(void);
 // Volume.
 void I_SetMusicVolume(int volume);
 // PAUSE game handling.
-void I_PauseSong();
-void I_ResumeSong();
+void I_PauseSong(
+    __attribute__((unused)) const int handle);
+void I_ResumeSong(
+    __attribute__((unused)) const int handle);
 // Registers a song handle to song data.
-int I_RegisterSong();
+int I_RegisterSong(
+    __attribute__((unused)) const void *handle);
 // Called by anything that wishes to start music.
 //  plays a song, and when the song is done,
 //  starts playing it again in an endless loop.
 // Horrible thing to do, considering.
-void I_PlaySong();
+void I_PlaySong(
+    __attribute__((unused)) const int handle);
 // Stops a song over 3 seconds.
-void I_StopSong();
+void I_StopSong(
+    __attribute__((unused)) const int handle);
 // See above (register), then think backwards
-void I_UnRegisterSong();
+void I_UnRegisterSong(
+    __attribute__((unused)) const int handle);
 
 #endif
 //-----------------------------------------------------------------------------

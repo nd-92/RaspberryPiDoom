@@ -76,10 +76,10 @@ void (*netsend)(void);
 //
 int UDPsocket(void)
 {
-    int s;
+    // int s;
 
     // allocate a socket
-    s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    const int s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (s < 0)
     {
         I_Error("can't create socket: %s", strerror(errno));
@@ -91,9 +91,9 @@ int UDPsocket(void)
 //
 // BindToLocalPort
 //
-void BindToLocalPort(int s, in_port_t port)
+void BindToLocalPort(const int s, const in_port_t port)
 {
-    int v;
+    // int v;
     struct sockaddr_in address;
 
     memset(&address, 0, sizeof(address));
@@ -101,7 +101,7 @@ void BindToLocalPort(int s, in_port_t port)
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = port;
 
-    v = bind(s, (sockaddr *)&address, sizeof(address));
+    const int v = bind(s, (sockaddr *)&address, sizeof(address));
     if (v == -1)
     {
         I_Error("BindToPort: bind: %s", strerror(errno));
@@ -113,7 +113,7 @@ void BindToLocalPort(int s, in_port_t port)
 //
 void PacketSend(void)
 {
-    int c;
+    // int c;
     doomdata_t sw;
 
     // byte swap
@@ -122,18 +122,19 @@ void PacketSend(void)
     sw.retransmitfrom = netbuffer->retransmitfrom;
     sw.starttic = netbuffer->starttic;
     sw.numtics = netbuffer->numtics;
-    for (c = 0; c < netbuffer->numtics; c++)
+    for (int d = 0; d < netbuffer->numtics; d++)
     {
-        sw.cmds[c].forwardmove = netbuffer->cmds[c].forwardmove;
-        sw.cmds[c].sidemove = netbuffer->cmds[c].sidemove;
-        sw.cmds[c].angleturn = htons(netbuffer->cmds[c].angleturn);
-        sw.cmds[c].consistancy = htons(netbuffer->cmds[c].consistancy);
-        sw.cmds[c].chatchar = netbuffer->cmds[c].chatchar;
-        sw.cmds[c].buttons = netbuffer->cmds[c].buttons;
+        sw.cmds[d].forwardmove = netbuffer->cmds[d].forwardmove;
+        sw.cmds[d].sidemove = netbuffer->cmds[d].sidemove;
+        sw.cmds[d].angleturn = htons(netbuffer->cmds[d].angleturn);
+        sw.cmds[d].consistancy = htons(netbuffer->cmds[d].consistancy);
+        sw.cmds[d].chatchar = netbuffer->cmds[d].chatchar;
+        sw.cmds[d].buttons = netbuffer->cmds[d].buttons;
     }
 
     // printf ("sending %i\n",gametic);
-    c = sendto(sendsocket, &sw, doomcom->datalength, 0, (sockaddr *)&sendaddress[doomcom->remotenode], sizeof(sendaddress[doomcom->remotenode]));
+    // const int c = sendto(sendsocket, &sw, doomcom->datalength, 0, (sockaddr *)&sendaddress[doomcom->remotenode], sizeof(sendaddress[doomcom->remotenode]));
+    sendto(sendsocket, &sw, doomcom->datalength, 0, (sockaddr *)&sendaddress[doomcom->remotenode], sizeof(sendaddress[doomcom->remotenode]));
 
     //	if (c == -1)
     //		I_Error ("SendPacket error: %s",strerror(errno));
@@ -147,11 +148,11 @@ void PacketGet(void)
     short i;
     // size_t c;
     struct sockaddr_in fromaddress;
-    int fromlen;
+    // int fromlen;
     doomdata_t sw;
 
-    fromlen = sizeof(fromaddress);
-    ssize_t c = recvfrom(insocket, &sw, sizeof(sw), 0, (struct sockaddr *)&fromaddress, (socklen_t *)(&fromlen));
+    const int fromlen = sizeof(fromaddress);
+    const ssize_t c = recvfrom(insocket, &sw, sizeof(sw), 0, (struct sockaddr *)&fromaddress, (socklen_t *)(&fromlen));
     if (c == -1)
     {
         if (errno != EWOULDBLOCK)
@@ -197,14 +198,14 @@ void PacketGet(void)
     netbuffer->starttic = sw.starttic;
     netbuffer->numtics = sw.numtics;
 
-    for (c = 0; c < netbuffer->numtics; c++)
+    for (int d = 0; d < netbuffer->numtics; d++)
     {
-        netbuffer->cmds[c].forwardmove = sw.cmds[c].forwardmove;
-        netbuffer->cmds[c].sidemove = sw.cmds[c].sidemove;
-        netbuffer->cmds[c].angleturn = ntohs(sw.cmds[c].angleturn);
-        netbuffer->cmds[c].consistancy = ntohs(sw.cmds[c].consistancy);
-        netbuffer->cmds[c].chatchar = sw.cmds[c].chatchar;
-        netbuffer->cmds[c].buttons = sw.cmds[c].buttons;
+        netbuffer->cmds[d].forwardmove = sw.cmds[d].forwardmove;
+        netbuffer->cmds[d].sidemove = sw.cmds[d].sidemove;
+        netbuffer->cmds[d].angleturn = ntohs(sw.cmds[d].angleturn);
+        netbuffer->cmds[d].consistancy = ntohs(sw.cmds[d].consistancy);
+        netbuffer->cmds[d].chatchar = sw.cmds[d].chatchar;
+        netbuffer->cmds[d].buttons = sw.cmds[d].buttons;
     }
 }
 
@@ -212,11 +213,11 @@ void PacketGet(void)
 char *GetLocalAddress(void)
 {
     char hostname[1024];
-    struct hostent *hostentry; // host information entry
-    int v;
+    const struct hostent *hostentry; // host information entry
+    // int v;
 
     // get local address
-    v = gethostname(hostname, sizeof(hostname));
+    const int v = gethostname(hostname, sizeof(hostname));
     if (v == -1)
     {
         I_Error("GetLocalAddress : gethostname: errno %d", errno);
@@ -239,8 +240,8 @@ void I_InitNetwork(void)
 {
     boolean trueval = true;
     int i;
-    int p;
-    struct hostent *hostentry; // host information entry
+    // int p;
+    const struct hostent *hostentry; // host information entry
 
     doomcom = (doomcom_t *)(malloc(sizeof(*doomcom)));
     memset(doomcom, 0, sizeof(*doomcom));
@@ -273,7 +274,7 @@ void I_InitNetwork(void)
         doomcom->extratics = 0;
     }
 
-    p = M_CheckParm("-port");
+    const int p = M_CheckParm("-port");
     if (p && p < myargc - 1)
     {
         // DOOMPORT = atoi(myargv[p + 1]);

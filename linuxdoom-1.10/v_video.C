@@ -37,7 +37,8 @@ static const char rcsid[] = "$Id: v_video.c,v 1.5 1997/02/03 22:45:13 b1 Exp $";
 #include "v_video.H"
 
 // Each screen is [SCREENWIDTH*SCREENHEIGHT];
-byte *screens[5];
+char *screens[5];
+// int *screens[5];
 
 int dirtybox[4];
 
@@ -166,7 +167,7 @@ void V_CopyRect(int srcx, int srcy, int srcscrn, int width, int height, int dest
 // V_DrawPatch
 // Masks a column based masked pic to the screen.
 //
-void V_DrawPatch(int x, int y, int scrn, patch_t *patch)
+void V_DrawPatch(int x, int y, int scrn, const patch_t *patch)
 {
 
     int count;
@@ -225,7 +226,7 @@ void V_DrawPatch(int x, int y, int scrn, patch_t *patch)
 // Masks a column based masked pic to the screen.
 // Flips horizontally, e.g. to mirror face.
 //
-void V_DrawPatchFlipped(int x, int y, int scrn, patch_t *patch)
+void V_DrawPatchFlipped(int x, int y, int scrn, const patch_t *patch)
 {
 
     int count;

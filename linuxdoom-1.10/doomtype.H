@@ -35,7 +35,8 @@ typedef enum
     true
 } boolean;
 #endif
-typedef unsigned char byte;
+// typedef unsigned char byte;
+typedef int byte;
 #endif
 
 // Predefined with some OS.

@@ -29,7 +29,7 @@
 int M_Random(void);
 
 // As M_Random, but used only by the play simulation.
-int P_Random(void);
+unsigned char P_Random(void);
 
 // Fix randoms for demos.
 void M_ClearRandom(void);

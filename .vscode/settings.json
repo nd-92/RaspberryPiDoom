@@ -121,6 +121,10 @@
         "DOOMNET.C": "cpp",
         "PORT.C": "cpp",
         "SERSETUP.C": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "IPXSETUP.C": "cpp",
+        "random": "cpp",
+        "limits": "cpp",
+        "algorithm": "cpp"
     }
 }

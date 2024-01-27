@@ -337,22 +337,22 @@ void I_GetEvent(void)
 	}
 }
 
-Cursor createnullcursor(Display *display, Window root)
+Cursor createnullcursor(Display *display, const Window root)
 {
-	Pixmap cursormask;
+	// Pixmap cursormask;
 	XGCValues xgc;
-	GC gc;
+	// GC gc;
 	XColor dummycolour;
-	Cursor cursor;
+	// Cursor cursor;
 
-	cursormask = XCreatePixmap(display, root, 1, 1, 1 /*depth*/);
+	const Pixmap cursormask = XCreatePixmap(display, root, 1, 1, 1 /*depth*/);
 	xgc.function = GXclear;
-	gc = XCreateGC(display, cursormask, GCFunction, &xgc);
+	const GC gc = XCreateGC(display, cursormask, GCFunction, &xgc);
 	XFillRectangle(display, cursormask, gc, 0, 0, 1, 1);
 	dummycolour.pixel = 0;
 	dummycolour.red = 0;
 	dummycolour.flags = 04;
-	cursor = XCreatePixmapCursor(display, cursormask, cursormask, &dummycolour, &dummycolour, 0, 0);
+	const Cursor cursor = XCreatePixmapCursor(display, cursormask, cursormask, &dummycolour, &dummycolour, 0, 0);
 	XFreePixmap(display, cursormask);
 	XFreeGC(display, gc);
 	return cursor;
@@ -405,16 +405,16 @@ void I_FinishUpdate(void)
 {
 
 	static int lasttic;
-	int tics;
-	int i;
+	// int tics;
+	// int i;
 	// UNUSED static unsigned char *bigscreen=0;
 
 	// draws little dots on the bottom of the screen
 	if (devparm)
 	{
 
-		i = I_GetTime();
-		tics = i - lasttic;
+		int i = I_GetTime();
+		int tics = i - lasttic;
 		lasttic = i;
 		if (tics > 20)
 		{
@@ -435,23 +435,24 @@ void I_FinishUpdate(void)
 	if (multiply == 2)
 	{
 		// unsigned int *olineptrs[2];
-		byte *olineptrs[2];
+		char *olineptrs[2];
 		// unsigned int *ilineptr;
-		byte *ilineptr;
+		// const char *ilineptr;
+		const char *ilineptr;
 		int x, y, j;
 		// unsigned int twoopixels;
 		// unsigned int twomoreopixels;
 		// unsigned int fouripixels;
-		byte twoopixels;
-		byte twomoreopixels;
-		byte fouripixels;
+		char twoopixels;
+		char twomoreopixels;
+		char fouripixels;
 
 		// ilineptr = (unsigned int *)(screens[0]);
 		ilineptr = screens[0];
 		for (j = 0; j < 2; j++)
 		{
 			// olineptrs[j] = (unsigned int *)&image->data[j * X_width];
-			olineptrs[j] = reinterpret_cast<byte *>(&image->data[j * static_cast<int>(X_width)]);
+			olineptrs[j] = reinterpret_cast<char *>(&image->data[j * static_cast<int>(X_width)]);
 		}
 
 		y = SCREENHEIGHT;
@@ -462,13 +463,13 @@ void I_FinishUpdate(void)
 			{
 				fouripixels = *ilineptr++;
 				twoopixels =											  //
-					(fouripixels & static_cast<byte>(0xff000000))		  //
-					| ((fouripixels >> 8) & static_cast<byte>(0xffff00))  //
-					| ((fouripixels >> 16) & static_cast<byte>(0xff));	  //
+					(fouripixels & static_cast<char>(0xff000000))		  //
+					| ((fouripixels >> 8) & static_cast<char>(0xffff00))  //
+					| ((fouripixels >> 16) & static_cast<char>(0xff));	  //
 				twomoreopixels =										  //
-					((fouripixels << 16) & static_cast<byte>(0xff000000)) //
-					| ((fouripixels << 8) & static_cast<byte>(0xffff00))  //
-					| (fouripixels & static_cast<byte>(0xff));			  //
+					((fouripixels << 16) & static_cast<char>(0xff000000)) //
+					| ((fouripixels << 8) & static_cast<char>(0xffff00))  //
+					| (fouripixels & static_cast<char>(0xff));			  //
 #ifdef __BIG_ENDIAN__
 				*olineptrs[0]++ = twoopixels;
 				*olineptrs[1]++ = twoopixels;
@@ -489,19 +490,19 @@ void I_FinishUpdate(void)
 	{
 		// unsigned int *olineptrs[3];
 		// unsigned int *ilineptr;
-		byte *olineptrs[3];
-		byte *ilineptr;
-		int x, y, j;
+		char *olineptrs[3];
+		const char *ilineptr;
+		int x, y;
 		// unsigned int fouropixels[3];
 		// unsigned int fouripixels;
-		byte fouropixels[3];
-		byte fouripixels;
+		char fouropixels[3];
+		char fouripixels;
 
 		// ilineptr = (unsigned int *)(screens[0]);
 		ilineptr = screens[0];
-		for (j = 0; j < 3; j++)
+		for (unsigned int j = 0; j < 3; j++)
 		{
-			olineptrs[j] = reinterpret_cast<byte *>(&image->data[j * static_cast<int>(X_width)]);
+			olineptrs[j] = &image->data[j * X_width];
 		}
 
 		y = SCREENHEIGHT;
@@ -512,17 +513,17 @@ void I_FinishUpdate(void)
 			{
 				fouripixels = *ilineptr++;
 				fouropixels[0] =										  //
-					(fouripixels & static_cast<byte>(0xff000000))		  //
-					| ((fouripixels >> 8) & static_cast<byte>(0xff0000))  //
-					| ((fouripixels >> 16) & static_cast<byte>(0xffff));  //
+					(fouripixels & static_cast<char>(0xff000000))		  //
+					| ((fouripixels >> 8) & static_cast<char>(0xff0000))  //
+					| ((fouripixels >> 16) & static_cast<char>(0xffff));  //
 				fouropixels[1] =										  //
-					((fouripixels << 8) & static_cast<byte>(0xff000000))  //
-					| (fouripixels & static_cast<byte>(0xffff00))		  //
-					| ((fouripixels >> 8) & static_cast<byte>(0xff));	  //
+					((fouripixels << 8) & static_cast<char>(0xff000000))  //
+					| (fouripixels & static_cast<char>(0xffff00))		  //
+					| ((fouripixels >> 8) & static_cast<char>(0xff));	  //
 				fouropixels[2] =										  //
-					((fouripixels << 16) & static_cast<byte>(0xffff0000)) //
-					| ((fouripixels << 8) & static_cast<byte>(0xff00))	  //
-					| (fouripixels & static_cast<byte>(0xff));			  //
+					((fouripixels << 16) & static_cast<char>(0xffff0000)) //
+					| ((fouripixels << 8) & static_cast<char>(0xff00))	  //
+					| (fouripixels & static_cast<char>(0xff));			  //
 #ifdef __BIG_ENDIAN__
 				*olineptrs[0]++ = fouropixels[0];
 				*olineptrs[1]++ = fouropixels[0];
@@ -596,11 +597,11 @@ void I_ReadScreen(byte *scr)
 //
 static XColor colors[256];
 
-void UploadNewPalette(Colormap cmap, byte *palette)
+void UploadNewPalette(const Colormap cmap, const byte *palette)
 {
 
-	int i;
-	unsigned short c;
+	// int i;
+	// unsigned short c;
 	static boolean firstcall = true;
 
 #ifdef __cplusplus
@@ -613,7 +614,7 @@ void UploadNewPalette(Colormap cmap, byte *palette)
 		if (firstcall)
 		{
 			firstcall = false;
-			for (i = 0; i < 256; i++)
+			for (int i = 0; i < 256; i++)
 			{
 				colors[i].pixel = static_cast<unsigned long>(i);
 				colors[i].flags = DoRed | DoGreen | DoBlue;
@@ -621,9 +622,9 @@ void UploadNewPalette(Colormap cmap, byte *palette)
 		}
 
 		// set the X colormap entries
-		for (i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++)
 		{
-			c = static_cast<unsigned short>(gammatable[usegamma][*palette++]);
+			unsigned short c = static_cast<unsigned short>(gammatable[usegamma][*palette++]);
 			colors[i].red = static_cast<unsigned short>((c << 8) + c);
 			c = static_cast<unsigned short>(gammatable[usegamma][*palette++]);
 			colors[i].green = static_cast<unsigned short>((c << 8) + c);
@@ -651,24 +652,24 @@ void I_SetPalette(byte *palette)
 //  thus there might have been stale
 //  handles accumulating.
 //
-void grabsharedmemory(size_t size)
+void grabsharedmemory(const size_t size)
 {
 
-	int key = ('d' << 24) | ('o' << 16) | ('o' << 8) | 'm';
+	key_t key = ('d' << 24) | ('o' << 16) | ('o' << 8) | 'm';
 	struct shmid_ds shminfo;
 	const size_t minsize = 320 * 200;
 	int id;
-	int rc;
+	// int rc;
 	// UNUSED int done=0;
 	int pollution = 5;
 
 	// try to use what was here before
 	do
 	{
-		id = shmget((key_t)key, minsize, 0777); // just get the id
+		id = shmget(key, minsize, 0777); // just get the id
 		if (id != -1)
 		{
-			rc = shmctl(id, IPC_STAT, &shminfo); // get stats on it
+			int rc = shmctl(id, IPC_STAT, &shminfo); // get stats on it
 			if (!rc)
 			{
 				if (shminfo.shm_nattch)
@@ -685,15 +686,14 @@ void grabsharedmemory(size_t size)
 						rc = shmctl(id, IPC_RMID, 0);
 						if (!rc)
 						{
-							fprintf(stderr,
-									"Was able to kill my old shared memory\n");
+							fprintf(stderr, "Was able to kill my old shared memory\n");
 						}
 						else
 						{
 							I_Error("Was NOT able to kill my old shared memory");
 						}
 
-						id = shmget((key_t)key, size, IPC_CREAT | 0777);
+						id = shmget(key, size, IPC_CREAT | 0777);
 						if (id == -1)
 						{
 							I_Error("Could not get shared memory");
@@ -705,9 +705,7 @@ void grabsharedmemory(size_t size)
 					}
 					if (size >= shminfo.shm_segsz)
 					{
-						fprintf(stderr,
-								"will use %d's stale shared memory\n",
-								shminfo.shm_cpid);
+						fprintf(stderr, "will use %d's stale shared memory\n", shminfo.shm_cpid);
 						break;
 					}
 					else
@@ -728,7 +726,7 @@ void grabsharedmemory(size_t size)
 		}
 		else
 		{
-			id = shmget((key_t)key, size, IPC_CREAT | 0777);
+			id = shmget(key, size, IPC_CREAT | 0777);
 			if (id == -1)
 			{
 				// extern int errno;
@@ -748,9 +746,9 @@ void grabsharedmemory(size_t size)
 	X_shminfo.shmid = id;
 
 	// attach to the shared memory segment
-	image->data = X_shminfo.shmaddr = (char *)(shmat(id, 0, 0));
+	image->data = X_shminfo.shmaddr = static_cast<char *>(shmat(id, 0, 0));
 
-	fprintf(stderr, "shared memory id=%d, addr=0x%x\n", id, (int)(image->data));
+	fprintf(stderr, "shared memory id=%d, addr=0x%x\n", id, reinterpret_cast<int>(image->data));
 }
 
 void I_InitGraphics(void)
@@ -758,7 +756,7 @@ void I_InitGraphics(void)
 
 	char *displayname;
 	char *d;
-	int n;
+	// int n;
 	int pnum;
 	int x = 0;
 	int y = 0;
@@ -767,11 +765,11 @@ void I_InitGraphics(void)
 	char xsign = ' ';
 	char ysign = ' ';
 
-	int oktodraw;
-	unsigned long attribmask;
+	// int oktodraw;
+	// unsigned long attribmask;
 	XSetWindowAttributes attribs;
 	XGCValues xgcvalues;
-	long unsigned int valuemask;
+	// long unsigned int valuemask;
 	static int firsttime = 1;
 
 	if (!firsttime)
@@ -780,7 +778,7 @@ void I_InitGraphics(void)
 	}
 	firsttime = 0;
 
-	signal(SIGINT, (void (*)(int))I_Quit);
+	signal(SIGINT, reinterpret_cast<void (*)(int)>(I_Quit));
 
 	if (M_CheckParm("-2"))
 	{
@@ -817,7 +815,7 @@ void I_InitGraphics(void)
 	if ((pnum = M_CheckParm("-geom"))) // suggest parentheses around assignment
 	{
 		// warning: char format, different type arg 3,5
-		n = sscanf(myargv[pnum + 1], "%c%d%c%d", &xsign, &x, &ysign, &y);
+		const int n = sscanf(myargv[pnum + 1], "%c%d%c%d", &xsign, &x, &ysign, &y);
 
 		if (n == 2)
 		{
@@ -870,7 +868,7 @@ void I_InitGraphics(void)
 	{
 		if (!displayname)
 		{
-			displayname = (char *)getenv("DISPLAY");
+			displayname = static_cast<char *>(getenv("DISPLAY"));
 		}
 		if (displayname)
 		{
@@ -896,20 +894,32 @@ void I_InitGraphics(void)
 	X_cmap = XCreateColormap(X_display, RootWindow(X_display, X_screen), X_visual, AllocAll);
 
 	// setup attributes for main window
-	attribmask = CWEventMask | CWColormap | CWBorderPixel;
+	const unsigned long attribmask = CWEventMask | CWColormap | CWBorderPixel;
 	attribs.event_mask = KeyPressMask | KeyReleaseMask | ExposureMask;
 
 	attribs.colormap = X_cmap;
 	attribs.border_pixel = 0;
 
 	// create the main window
-	X_mainWindow = XCreateWindow(X_display, RootWindow(X_display, X_screen), x, y, X_width, X_height, 0, 8, InputOutput, X_visual, attribmask, &attribs);
+	X_mainWindow = XCreateWindow(
+		X_display,
+		RootWindow(X_display, X_screen),
+		x,
+		y,
+		X_width,
+		X_height,
+		0,
+		8,
+		InputOutput,
+		X_visual,
+		attribmask,
+		&attribs);
 
 	XInstallColormap(X_display, X_cmap);
 	XDefineCursor(X_display, X_mainWindow, createnullcursor(X_display, X_mainWindow));
 
 	// create the GC
-	valuemask = GCGraphicsExposures;
+	const long unsigned int valuemask = GCGraphicsExposures;
 	xgcvalues.graphics_exposures = False;
 	X_gc = XCreateGC(X_display, X_mainWindow, valuemask, &xgcvalues);
 
@@ -917,7 +927,7 @@ void I_InitGraphics(void)
 	XMapWindow(X_display, X_mainWindow);
 
 	// wait until it is OK to draw
-	oktodraw = 0;
+	int oktodraw = 0;
 	while (!oktodraw)
 	{
 		XNextEvent(X_display, &X_event);
@@ -939,22 +949,17 @@ void I_InitGraphics(void)
 		X_shmeventtype = XShmGetEventBase(X_display) + ShmCompletion;
 
 		// create the image
-		image = XShmCreateImage(X_display, X_visual, 8, ZPixmap, 0, &X_shminfo, X_width, X_height);
+		image = XShmCreateImage(
+			X_display,
+			X_visual,
+			8,
+			ZPixmap,
+			0,
+			&X_shminfo,
+			X_width,
+			X_height);
 
 		grabsharedmemory(static_cast<size_t>(image->bytes_per_line * image->height));
-
-		// UNUSED
-		// create the shared memory segment
-		// X_shminfo.shmid = shmget (IPC_PRIVATE,
-		// image->bytes_per_line * image->height, IPC_CREAT | 0777);
-		// if (X_shminfo.shmid < 0)
-		// {
-		// perror("");
-		// I_Error("shmget() failed in InitGraphics()");
-		// }
-		// fprintf(stderr, "shared memory id=%d\n", X_shminfo.shmid);
-		// attach to the shared memory segment
-		// image->data = X_shminfo.shmaddr = shmat(X_shminfo.shmid, 0, 0);
 
 		if (!image->data)
 		{
@@ -964,20 +969,32 @@ void I_InitGraphics(void)
 
 		// get the X server to attach to it
 		if (!XShmAttach(X_display, &X_shminfo))
+		{
 			I_Error("XShmAttach() failed in InitGraphics()");
+		}
 	}
 	else
 	{
-		image = XCreateImage(X_display, X_visual, 8, ZPixmap, 0, (char *)malloc(X_width * X_height), X_width, X_height, 8, static_cast<int>(X_width));
+		image = XCreateImage(
+			X_display,
+			X_visual,
+			8,
+			ZPixmap,
+			0,
+			static_cast<char *>(malloc(X_width * X_height)),
+			X_width,
+			X_height,
+			8,
+			static_cast<int>(X_width));
 	}
 
 	if (multiply == 1)
 	{
-		screens[0] = (unsigned char *)(image->data);
+		screens[0] = reinterpret_cast<char *>(image->data);
 	}
 	else
 	{
-		screens[0] = (unsigned char *)malloc(SCREENWIDTH * SCREENHEIGHT);
+		screens[0] = static_cast<char *>(malloc(SCREENWIDTH * SCREENHEIGHT));
 	}
 }
 

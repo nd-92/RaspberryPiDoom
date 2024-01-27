@@ -40,7 +40,7 @@
 // Screen 0 is the screen updated by I_Update screen.
 // Screen 1 is an extra buffer.
 
-extern byte *screens[5];
+extern char *screens[5];
 
 extern int dirtybox[4];
 
@@ -52,7 +52,7 @@ void V_Init(void);
 
 void V_CopyRect(int srcx, int srcy, int srcscrn, int width, int height, int destx, int desty, int destscrn);
 
-void V_DrawPatch(int x, int y, int scrn, patch_t *patch);
+void V_DrawPatch(int x, int y, int scrn, const patch_t *patch);
 
 void V_DrawPatchDirect(int x, int y, int scrn, patch_t *patch);
 

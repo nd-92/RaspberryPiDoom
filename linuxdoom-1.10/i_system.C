@@ -43,9 +43,14 @@ static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #endif
 #include "i_system.H"
 
-const size_t mb_used = 6;
+// const size_t mb_used = 6;
+// const extern size_t mb_used = 6;
+const extern int mb_used = 6;
 
-void I_Tactile(__attribute__((unused)) int on, __attribute__((unused)) int off, __attribute__((unused)) int total)
+void I_Tactile(
+    __attribute__((unused)) const int on,
+    __attribute__((unused)) const int off,
+    __attribute__((unused)) int total)
 {
     total = 0;
 }
@@ -61,10 +66,10 @@ int I_GetHeapSize(void)
     return mb_used * 1024 * 1024;
 }
 
-byte *I_ZoneBase(size_t *size)
+byte *I_ZoneBase(int *size)
 {
     *size = mb_used * 1024 * 1024;
-    return static_cast<byte *>(malloc(*size));
+    return static_cast<byte *>(malloc(static_cast<size_t>(*size)));
 }
 
 //
@@ -75,7 +80,7 @@ int I_GetTime(void)
 {
     struct timeval tp;
     struct timezone tzp;
-    int newtics;
+    // int newtics;
     static int basetime = 0;
 
     gettimeofday(&tp, &tzp);
@@ -83,8 +88,8 @@ int I_GetTime(void)
     {
         basetime = tp.tv_sec;
     }
-    newtics = (tp.tv_sec - basetime) * TICRATE + tp.tv_usec * TICRATE / 1000000;
-    return newtics;
+    // const int newtics = (tp.tv_sec - basetime) * TICRATE + tp.tv_usec * TICRATE / 1000000;
+    return (tp.tv_sec - basetime) * TICRATE + tp.tv_usec * TICRATE / 1000000;
 }
 
 //

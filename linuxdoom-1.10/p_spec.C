@@ -520,13 +520,13 @@ void P_CrossSpecialLine(int linenum, int side, mobj_t *thing)
 		// All from here to RETRIGGERS.
 	case 2:
 		// Open Door
-		EV_DoDoor(line, open);
+		EV_DoDoor(line, openDoor);
 		line->special = 0;
 		break;
 
 	case 3:
 		// Close Door
-		EV_DoDoor(line, close);
+		EV_DoDoor(line, closeDoor);
 		line->special = 0;
 		break;
 
@@ -779,7 +779,7 @@ void P_CrossSpecialLine(int linenum, int side, mobj_t *thing)
 
 	case 75:
 		// Close Door
-		EV_DoDoor(line, close);
+		EV_DoDoor(line, closeDoor);
 		break;
 
 	case 76:
@@ -824,7 +824,7 @@ void P_CrossSpecialLine(int linenum, int side, mobj_t *thing)
 
 	case 86:
 		// Open Door
-		EV_DoDoor(line, open);
+		EV_DoDoor(line, openDoor);
 		break;
 
 	case 87:
@@ -962,7 +962,7 @@ void P_ShootSpecialLine(mobj_t *thing, line_t *line)
 
 	case 46:
 		// OPEN DOOR
-		EV_DoDoor(line, open);
+		EV_DoDoor(line, openDoor);
 		P_ChangeSwitchTexture(line, 1);
 		break;
 

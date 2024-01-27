@@ -37,7 +37,11 @@ enum
     wipe_NUMWIPES
 };
 
-int wipe_StartScreen(int x, int y, int width, int height);
+int wipe_StartScreen(
+    __attribute__((unused)) const int x,
+    __attribute__((unused)) const int y_,
+    __attribute__((unused)) const int width,
+    __attribute__((unused)) const int height);
 
 int wipe_EndScreen(int x, int y, int width, int height);
 

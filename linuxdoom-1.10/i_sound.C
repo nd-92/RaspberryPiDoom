@@ -109,7 +109,8 @@ int audio_fd;
 // Basically, samples from all active internal channels
 //  are modifed and added, and stored in the buffer
 //  that is submitted to the audio device.
-signed short mixbuffer[MIXBUFFERSIZE];
+// signed short mixbuffer[MIXBUFFERSIZE];
+int mixbuffer[MIXBUFFERSIZE];
 
 // The channel step amount...
 unsigned int channelstep[NUM_CHANNELS];
@@ -117,8 +118,10 @@ unsigned int channelstep[NUM_CHANNELS];
 unsigned int channelstepremainder[NUM_CHANNELS];
 
 // The channel data pointers, start and end.
-unsigned char *channels[NUM_CHANNELS];
-unsigned char *channelsend[NUM_CHANNELS];
+// unsigned char *channels[NUM_CHANNELS];
+// unsigned char *channelsend[NUM_CHANNELS];
+int *channels[NUM_CHANNELS];
+int *channelsend[NUM_CHANNELS];
 
 // Time/gametic that the channel started playing,
 //  used to determine oldest, which automatically
@@ -141,24 +144,24 @@ int channelids[NUM_CHANNELS];
 int steptable[256];
 
 // Volume lookups.
-// int vol_lookup[128 * 256];
-signed short vol_lookup[128 * 256];
+int vol_lookup[128 * 256];
+// signed short vol_lookup[128 * 256];
 
 // Hardware left and right channel volume lookup.
-// int *channelleftvol_lookup[NUM_CHANNELS];
-// int *channelrightvol_lookup[NUM_CHANNELS];
-signed short *channelleftvol_lookup[NUM_CHANNELS];
-signed short *channelrightvol_lookup[NUM_CHANNELS];
+int *channelleftvol_lookup[NUM_CHANNELS];
+int *channelrightvol_lookup[NUM_CHANNELS];
+// signed short *channelleftvol_lookup[NUM_CHANNELS];
+// signed short *channelrightvol_lookup[NUM_CHANNELS];
 
 //
 // Safe ioctl, convenience.
 //
-void myioctl(int fd, long unsigned int command, int *arg)
+void myioctl(
+    const int fd,
+    const long unsigned int command,
+    const int *arg)
 {
-  int rc;
-  // extern int errno;
-
-  rc = ioctl(fd, command, arg);
+  const int rc = ioctl(fd, command, arg);
   if (rc < 0)
   {
     fprintf(stderr, "ioctl(dsp,%lu,arg) failed\n", command);
@@ -171,13 +174,14 @@ void myioctl(int fd, long unsigned int command, int *arg)
 // This function loads the sound data from the WAD lump,
 //  for single sound.
 //
-void *getsfx(char *sfxname, size_t *len)
+void *getsfx(
+    const char *sfxname,
+    size_t *len)
 {
-  unsigned char *sfx;
-  unsigned char *paddedsfx;
-  size_t i;
-  size_t size;
-  size_t paddedsize;
+  // unsigned char *sfx;
+  // unsigned char *paddedsfx;
+  int *sfx;
+  int *paddedsfx;
   char name[20];
   int sfxlump;
 
@@ -204,7 +208,7 @@ void *getsfx(char *sfxname, size_t *len)
     sfxlump = W_GetNumForName(name);
   }
 
-  size = W_LumpLength(sfxlump);
+  const size_t size = W_LumpLength(sfxlump);
 
   // Debug.
   // fprintf( stderr, "." );
@@ -212,21 +216,21 @@ void *getsfx(char *sfxname, size_t *len)
   //	     sfxname, sfxlump, size );
   // fflush( stderr );
 
-  sfx = (unsigned char *)W_CacheLumpNum(sfxlump, PU_STATIC);
+  sfx = static_cast<int *>(W_CacheLumpNum(sfxlump, PU_STATIC));
 
   // Pads the sound effect out to the mixing buffer size.
   // The original realloc would interfere with zone memory.
-  paddedsize = ((size - 8 + (SAMPLECOUNT - 1)) / SAMPLECOUNT) * SAMPLECOUNT;
+  const size_t paddedsize = ((size - 8 + (SAMPLECOUNT - 1)) / SAMPLECOUNT) * SAMPLECOUNT;
 
   // Allocate from zone memory.
-  paddedsfx = (unsigned char *)Z_Malloc(paddedsize + 8, PU_STATIC, 0);
+  paddedsfx = static_cast<int *>(Z_Malloc(paddedsize + 8, PU_STATIC, 0));
   // ddt: (unsigned char *) realloc(sfx, paddedsize+8);
   // This should interfere with zone memory handling,
   //  which does not kick in in the soundserver.
 
   // Now copy and pad.
   memcpy(paddedsfx, sfx, size);
-  for (i = size; i < paddedsize + 8; i++)
+  for (size_t i = size; i < paddedsize + 8; i++)
   {
     paddedsfx[i] = 128;
   }
@@ -238,7 +242,7 @@ void *getsfx(char *sfxname, size_t *len)
   *len = paddedsize;
 
   // Return allocated padded data.
-  return (void *)(paddedsfx + 8);
+  return static_cast<void *>(paddedsfx + 8);
 }
 
 //
@@ -248,7 +252,11 @@ void *getsfx(char *sfxname, size_t *len)
 //  (eight, usually) of internal channels.
 // Returns a handle.
 //
-int addsfx(int sfxid, int volume, unsigned int step, int seperation)
+int addsfx(
+    const int sfxid,
+    const int volume,
+    const unsigned int step,
+    int seperation)
 {
   static unsigned short handlenums = 0;
 
@@ -259,8 +267,8 @@ int addsfx(int sfxid, int volume, unsigned int step, int seperation)
   int oldestnum = 0;
   int slot;
 
-  int rightvol;
-  int leftvol;
+  // int rightvol;
+  // int leftvol;
 
   // Chainsaw troubles.
   // Play these sound effects only one at a time.
@@ -308,7 +316,7 @@ int addsfx(int sfxid, int volume, unsigned int step, int seperation)
   // Okay, in the less recent channel,
   //  we will handle the new SFX.
   // Set pointer to raw data.
-  channels[slot] = (unsigned char *)S_sfx[sfxid].data;
+  channels[slot] = (int *)S_sfx[sfxid].data;
   // Set pointer to end of raw data.
   channelsend[slot] = channels[slot] + lengths[sfxid];
 
@@ -337,9 +345,9 @@ int addsfx(int sfxid, int volume, unsigned int step, int seperation)
   // Per left/right channel.
   //  x^2 seperation,
   //  adjust volume properly.
-  leftvol = volume - ((volume * seperation * seperation) >> 16); ///(256*256);
+  const int leftvol = volume - ((volume * seperation * seperation) >> 16); ///(256*256);
   seperation = seperation - 257;
-  rightvol = volume - ((volume * seperation * seperation) >> 16);
+  const int rightvol = volume - ((volume * seperation * seperation) >> 16);
 
   // Sanity check, clamp volume.
   if (rightvol < 0 || rightvol > 127)
@@ -394,7 +402,7 @@ void I_SetChannels()
   // I fail to see that this is currently used.
   for (int i = -128; i < 128; i++)
   {
-    steptablemid[i] = (int)(pow(2.0, (i / 64.0)) * 65536.0);
+    steptablemid[i] = static_cast<int>(pow(2.0, (static_cast<double>(i) / 64.0)) * 65536.0);
   }
 
   // Generates volume lookup tables
@@ -409,7 +417,7 @@ void I_SetChannels()
   }
 }
 
-void I_SetSfxVolume(int volume)
+void I_SetSfxVolume(const int volume)
 {
   // Identical to DOS.
   // Basically, this should propagate
@@ -420,7 +428,7 @@ void I_SetSfxVolume(int volume)
 }
 
 // MUSIC API - dummy. Some code from DOS version.
-void I_SetMusicVolume(int volume)
+void I_SetMusicVolume(const int volume)
 {
   // Internal state variable.
   snd_MusicVolume = volume;
@@ -432,7 +440,7 @@ void I_SetMusicVolume(int volume)
 // Retrieve the raw data lump index
 //  for a given SFX name.
 //
-int I_GetSfxLumpNum(sfxinfo_t *sfx)
+int I_GetSfxLumpNum(const sfxinfo_t *sfx)
 {
   char namebuf[9];
   sprintf(namebuf, "ds%s", sfx->name);
@@ -451,7 +459,12 @@ int I_GetSfxLumpNum(sfxinfo_t *sfx)
 // Pitching (that is, increased speed of playback)
 //  is set, but currently not used by mixing.
 //
-int I_StartSound(int id, int vol, int sep, int pitch)
+int I_StartSound(
+    const int id,
+    const int vol,
+    const int sep,
+    const int pitch,
+    __attribute__((unused)) const int priority)
 {
 
   // UNUSED
@@ -478,7 +491,7 @@ int I_StartSound(int id, int vol, int sep, int pitch)
 #endif
 }
 
-void I_StopSound()
+void I_StopSound(__attribute__((unused)) const int handle)
 {
   // You need the handle returned by StartSound.
   // Would be looping all channels,
@@ -489,7 +502,7 @@ void I_StopSound()
   // handle = 0;
 }
 
-int I_SoundIsPlaying(int handle)
+int I_SoundIsPlaying(const int handle)
 {
   // Ouch.
   return gametic < handle;
@@ -517,25 +530,25 @@ void I_UpdateSound(void)
 
   // Mix current sound data.
   // Data, from raw sound, for right and left.
-  unsigned int sample;
-  signed short dl;
-  signed short dr;
+  // unsigned int sample;
+  int dl;
+  int dr;
 
   // Pointers in global mixbuffer, left, right, end.
-  signed short *leftout;
-  signed short *rightout;
-  signed short *leftend;
+  int *leftout;
+  int *rightout;
+  const int *leftend;
   // Step in mixbuffer, left and right, thus two.
-  int step;
+  // int step;
 
   // Mixing channel index.
-  int chan;
+  // int chan;
 
   // Left and right channel
   //  are in global mixbuffer, alternating.
   leftout = mixbuffer;
   rightout = mixbuffer + 1;
-  step = 2;
+  const int step = 2;
 
   // Determine end, for left channel only
   //  (right channel is implicit).
@@ -553,13 +566,13 @@ void I_UpdateSound(void)
     // Love thy L2 chache - made this a loop.
     // Now more channels could be set at compile time
     //  as well. Thus loop those  channels.
-    for (chan = 0; chan < NUM_CHANNELS; chan++)
+    for (unsigned int chan = 0; chan < NUM_CHANNELS; chan++)
     {
       // Check channel, if active.
       if (channels[chan])
       {
         // Get the raw data from the channel.
-        sample = *channels[chan];
+        const int sample = *channels[chan];
         // Add left and right part
         //  for this channel (sound)
         //  to the current data.
@@ -640,7 +653,11 @@ void I_SubmitSound(void)
   write(audio_fd, mixbuffer, SAMPLECOUNT * BUFMUL);
 }
 
-void I_UpdateSoundParams()
+void I_UpdateSoundParams(
+    __attribute__((unused)) const int handle,
+    __attribute__((unused)) const int vol,
+    __attribute__((unused)) const int sep,
+    __attribute__((unused)) const int pitch)
 {
   // I fail too see that this is used.
   // Would be using the handle to identify
@@ -697,9 +714,7 @@ void I_InitSound()
 
   if (getenv("DOOMWADDIR"))
   {
-    sprintf(buffer, "%s/%s",
-            getenv("DOOMWADDIR"),
-            sndserver_filename);
+    sprintf(buffer, "%s/%s", getenv("DOOMWADDIR"), sndserver_filename);
   }
   else
   {
@@ -794,7 +809,7 @@ void I_ShutdownMusic(void) {}
 static int looping_ = 0;
 static int musicdies = -1;
 
-void I_PlaySong()
+void I_PlaySong(__attribute__((unused)) const int handle)
 {
   // UNUSED.
   // handle = looping = 0;
@@ -802,19 +817,19 @@ void I_PlaySong()
   // looping = 0;
 }
 
-void I_PauseSong()
+void I_PauseSong(__attribute__((unused)) const int handle)
 {
   // UNUSED.
   // handle = 0;
 }
 
-void I_ResumeSong()
+void I_ResumeSong(__attribute__((unused)) const int handle)
 {
   // UNUSED.
   // handle = 0;
 }
 
-void I_StopSong()
+void I_StopSong(__attribute__((unused)) const int handle)
 {
   // UNUSED.
   // handle = 0;
@@ -823,13 +838,13 @@ void I_StopSong()
   musicdies = 0;
 }
 
-void I_UnRegisterSong()
+void I_UnRegisterSong(__attribute__((unused)) const int handle)
 {
   // UNUSED.
   // handle = 0;
 }
 
-int I_RegisterSong()
+int I_RegisterSong(__attribute__((unused)) const void *handle)
 {
   // UNUSED.
   // data = NULL;
@@ -894,7 +909,7 @@ void I_HandleSoundTimer(__attribute__((unused)) const int ignore)
 }
 
 // Get the interrupt. Set duration in millisecs.
-int I_SoundSetTimer(int duration_of_tick)
+int I_SoundSetTimer(const int duration_of_tick)
 {
   // Needed for gametick clockwork.
   struct itimerval value;
@@ -902,7 +917,7 @@ int I_SoundSetTimer(int duration_of_tick)
   struct sigaction act;
   struct sigaction oact;
 
-  int res;
+  // int res;
 
   // This sets to SA_ONESHOT and SA_NOMASK, thus we can not use it.
   //     signal( _sig, handle_SIG_TICK );
@@ -922,7 +937,7 @@ int I_SoundSetTimer(int duration_of_tick)
   value.it_value.tv_usec = duration_of_tick;
 
   // Error is -1.
-  res = setitimer(itimer, &value, &ovalue);
+  const int res = setitimer(itimer, &value, &ovalue);
 
   // Debug.
   if (res == -1)

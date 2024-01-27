@@ -25,6 +25,10 @@
 #ifndef __P_SPEC__
 #define __P_SPEC__
 
+// #include "d_think.H"
+#include "r_defs.H"
+#include "doomtype.H"
+
 //
 // End-level timer (-TIMER option)
 //
@@ -61,7 +65,7 @@ side_t *getSide(int currentSector, int line, int side);
 fixed_t P_FindLowestFloorSurrounding(sector_t *sec);
 fixed_t P_FindHighestFloorSurrounding(sector_t *sec);
 
-fixed_tP_FindNextHighestFloor(sector_t *sec, int currentheight);
+fixed_t P_FindNextHighestFloor(sector_t *sec, int currentheight);
 
 fixed_t P_FindLowestCeilingSurrounding(sector_t *sec);
 fixed_t P_FindHighestCeilingSurrounding(sector_t *sec);
@@ -249,8 +253,8 @@ typedef enum
 {
     normal,
     close30ThenOpen,
-    close,
-    open,
+    closeDoor,
+    openDoor,
     raiseIn5Mins,
     blazeRaise,
     blazeOpen,

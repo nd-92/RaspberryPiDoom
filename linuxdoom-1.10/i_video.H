@@ -22,6 +22,14 @@
 #ifndef __I_VIDEO__
 #define __I_VIDEO__
 
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+#include <sys/time.h>
+#include <unistd.h>
+
 #include "doomtype.H"
 
 #ifdef __GNUG__
@@ -42,7 +50,7 @@ void I_UpdateNoBlit(void);
 void I_FinishUpdate(void);
 
 // Wait for vertical retrace or pause a bit.
-void I_WaitVBL(int count);
+void I_WaitVBL(const useconds_t count);
 
 void I_ReadScreen(byte *scr);
 

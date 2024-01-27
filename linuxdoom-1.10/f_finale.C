@@ -24,6 +24,7 @@
 static const char rcsid[] = "$Id: f_finale.c,v 1.5 1997/02/03 21:26:34 b1 Exp $";
 
 #include <ctype.h>
+#include <algorithm>
 
 // Functions.
 #include "i_system.H"
@@ -85,7 +86,78 @@ const char *finaleflat;
 
 void F_StartCast(void);
 void F_CastTicker(void);
-boolean F_CastResponder(event_t *ev);
+
+int castnum;
+int casttics;
+state_t *caststate;
+boolean castdeath;
+int castframes;
+int castonmelee;
+boolean castattacking;
+
+//
+// Final DOOM 2 animation
+// Casting by id Software.
+//   in order of appearance
+//
+typedef struct
+{
+	const char *name;
+	mobjtype_t type;
+} castinfo_t;
+
+castinfo_t castorder[] = {
+	{CC_ZOMBIE, MT_POSSESSED},
+	{CC_SHOTGUN, MT_SHOTGUY},
+	{CC_HEAVY, MT_CHAINGUY},
+	{CC_IMP, MT_TROOP},
+	{CC_DEMON, MT_SERGEANT},
+	{CC_LOST, MT_SKULL},
+	{CC_CACO, MT_HEAD},
+	{CC_HELL, MT_KNIGHT},
+	{CC_BARON, MT_BRUISER},
+	{CC_ARACH, MT_BABY},
+	{CC_PAIN, MT_PAIN},
+	{CC_REVEN, MT_UNDEAD},
+	{CC_MANCU, MT_FATSO},
+	{CC_ARCH, MT_VILE},
+	{CC_SPIDER, MT_SPIDER},
+	{CC_CYBER, MT_CYBORG},
+	{CC_HERO, MT_PLAYER},
+	{NULL, MT_PLAYER}};
+
+#include "hu_stuff.H"
+extern const patch_t *hu_font[HU_FONTSIZE];
+extern gamestate_t wipegamestate;
+
+//
+// F_CastResponder
+//
+boolean F_CastResponder(const event_t *ev)
+{
+	if (ev->type != ev_keydown)
+	{
+		return false;
+	}
+
+	if (castdeath)
+	{
+		return true;
+	} // already in dying frames
+
+	// go into death frame
+	castdeath = true;
+	caststate = &states[mobjinfo[castorder[castnum].type].deathstate];
+	casttics = caststate->tics;
+	castframes = 0;
+	castattacking = false;
+	if (mobjinfo[castorder[castnum].type].deathsound)
+	{
+		S_StartSound(NULL, mobjinfo[castorder[castnum].type].deathsound);
+	}
+
+	return true;
+}
 void F_CastDrawer(void);
 
 //
@@ -186,7 +258,7 @@ void F_StartFinale(void)
 	finalecount = 0;
 }
 
-boolean F_Responder(event_t *event)
+boolean F_Responder(const event_t *event)
 {
 	if (finalestage == 2)
 	{
@@ -201,11 +273,10 @@ boolean F_Responder(event_t *event)
 //
 void F_Ticker(void)
 {
-	int i;
-
 	// check for skipping
 	if ((gamemode == commercial) && (finalecount > 50))
 	{
+		int i;
 		// go on to the next level
 		for (i = 0; i < MAXPLAYERS; i++)
 		{
@@ -260,28 +331,26 @@ void F_Ticker(void)
 // F_TextWrite
 //
 
-#include "hu_stuff.H"
-extern patch_t *hu_font[HU_FONTSIZE];
-
 void F_TextWrite(void)
 {
-	byte *src;
-	byte *dest;
+	const byte *src;
+	// byte *dest;
+	char *dest;
 
-	int x, y, w;
-	int count;
+	// int w;
+	// int count;
 	// char *ch;
-	int c;
-	int cx;
-	int cy;
+	// int c;
+	// int cx;
+	// int cy;
 
 	// erase the entire screen to a tiled background
-	src = (byte *)W_CacheLumpName(finaleflat, PU_CACHE);
+	src = static_cast<byte *>(W_CacheLumpName(finaleflat, PU_CACHE));
 	dest = screens[0];
 
-	for (y = 0; y < SCREENHEIGHT; y++)
+	for (int y = 0; y < SCREENHEIGHT; y++)
 	{
-		for (x = 0; x < SCREENWIDTH / 64; x++)
+		for (int x = 0; x < SCREENWIDTH / 64; x++)
 		{
 			memcpy(dest, src + ((y & 63) << 6), 64);
 			dest += 64;
@@ -296,18 +365,18 @@ void F_TextWrite(void)
 	V_MarkRect(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
 	// draw some of the text onto the screen
-	cx = 10;
-	cy = 10;
+	int cx = 10;
+	int cy = 10;
 	const char *ch = finaletext;
 
-	count = (finalecount - 10) / TEXTSPEED;
+	int count = (finalecount - 10) / TEXTSPEED;
 	if (count < 0)
 	{
 		count = 0;
 	}
 	for (; count; count--)
 	{
-		c = *ch++;
+		int c = *ch++;
 		if (!c)
 		{
 			break;
@@ -326,7 +395,7 @@ void F_TextWrite(void)
 			continue;
 		}
 
-		w = SHORT(hu_font[c]->width);
+		const int w = SHORT(hu_font[c]->width);
 		if (cx + w > SCREENWIDTH)
 		{
 			break;
@@ -337,49 +406,8 @@ void F_TextWrite(void)
 }
 
 //
-// Final DOOM 2 animation
-// Casting by id Software.
-//   in order of appearance
-//
-typedef struct
-{
-	const char *name;
-	mobjtype_t type;
-} castinfo_t;
-
-castinfo_t castorder[] = {
-	{CC_ZOMBIE, MT_POSSESSED},
-	{CC_SHOTGUN, MT_SHOTGUY},
-	{CC_HEAVY, MT_CHAINGUY},
-	{CC_IMP, MT_TROOP},
-	{CC_DEMON, MT_SERGEANT},
-	{CC_LOST, MT_SKULL},
-	{CC_CACO, MT_HEAD},
-	{CC_HELL, MT_KNIGHT},
-	{CC_BARON, MT_BRUISER},
-	{CC_ARACH, MT_BABY},
-	{CC_PAIN, MT_PAIN},
-	{CC_REVEN, MT_UNDEAD},
-	{CC_MANCU, MT_FATSO},
-	{CC_ARCH, MT_VILE},
-	{CC_SPIDER, MT_SPIDER},
-	{CC_CYBER, MT_CYBORG},
-	{CC_HERO, MT_PLAYER},
-
-	{NULL, MT_PLAYER}};
-
-int castnum;
-int casttics;
-state_t *caststate;
-boolean castdeath;
-int castframes;
-int castonmelee;
-boolean castattacking;
-
-//
 // F_StartCast
 //
-extern gamestate_t wipegamestate;
 
 void F_StartCast(void)
 {
@@ -400,11 +428,13 @@ void F_StartCast(void)
 //
 void F_CastTicker(void)
 {
-	int st;
-	int sfx;
+	// int st;
+	// int sfx;
 
 	if (--casttics > 0)
-		return; // not time to change state yet
+	{
+		return;
+	} // not time to change state yet
 
 	if (caststate->tics == -1 || caststate->nextstate == S_NULL)
 	{
@@ -424,12 +454,13 @@ void F_CastTicker(void)
 	}
 	else
 	{
+		int sfx;
 		// just advance to next state in animation
 		if (caststate == &states[S_PLAY_ATK1])
 		{
 			goto stopattack;
 		} // Oh, gross hack!
-		st = caststate->nextstate;
+		const int st = caststate->nextstate;
 		caststate = &states[st];
 		castframes++;
 
@@ -551,47 +582,17 @@ void F_CastTicker(void)
 	}
 }
 
-//
-// F_CastResponder
-//
-
-boolean F_CastResponder(event_t *ev)
-{
-	if (ev->type != ev_keydown)
-	{
-		return false;
-	}
-
-	if (castdeath)
-	{
-		return true;
-	} // already in dying frames
-
-	// go into death frame
-	castdeath = true;
-	caststate = &states[mobjinfo[castorder[castnum].type].deathstate];
-	casttics = caststate->tics;
-	castframes = 0;
-	castattacking = false;
-	if (mobjinfo[castorder[castnum].type].deathsound)
-	{
-		S_StartSound(NULL, mobjinfo[castorder[castnum].type].deathsound);
-	}
-
-	return true;
-}
-
 void F_CastPrint(const char *text)
 {
 	// char *ch;
 	int c;
-	int cx;
+	// int cx;
 	int w;
-	int width;
+	// int width;
 
 	// find width
 	const char *ch = text;
-	width = 0;
+	int width = 0;
 
 	while (ch)
 	{
@@ -612,7 +613,7 @@ void F_CastPrint(const char *text)
 	}
 
 	// draw it
-	cx = 160 - width / 2;
+	int cx = 160 - width / 2;
 	ch = text;
 	while (ch)
 	{
@@ -637,28 +638,28 @@ void F_CastPrint(const char *text)
 //
 // F_CastDrawer
 //
-void V_DrawPatchFlipped(int x, int y, int scrn, patch_t *patch);
+void V_DrawPatchFlipped(int x, int y, int scrn, const patch_t *patch);
 
 void F_CastDrawer(void)
 {
-	spritedef_t *sprdef;
-	spriteframe_t *sprframe;
-	int lump;
-	boolean flip;
-	patch_t *patch;
+	const spritedef_t *sprdef;
+	const spriteframe_t *sprframe;
+	// int lump;
+	// boolean flip;
+	const patch_t *patch;
 
 	// erase the entire screen to a background
-	V_DrawPatch(0, 0, 0, (patch_t *)W_CacheLumpName("BOSSBACK", PU_CACHE));
+	V_DrawPatch(0, 0, 0, static_cast<patch_t *>(W_CacheLumpName("BOSSBACK", PU_CACHE)));
 
 	F_CastPrint(castorder[castnum].name);
 
 	// draw the current frame in the middle of the screen
 	sprdef = &sprites[caststate->sprite];
 	sprframe = &sprdef->spriteframes[caststate->frame & FF_FRAMEMASK];
-	lump = sprframe->lump[0];
-	flip = (boolean)sprframe->flip[0];
+	const int lump = sprframe->lump[0];
+	const boolean flip = static_cast<boolean>(sprframe->flip[0]);
 
-	patch = (patch_t *)W_CacheLumpNum(lump + firstspritelump, PU_CACHE);
+	patch = static_cast<const patch_t *>(W_CacheLumpNum(lump + firstspritelump, PU_CACHE));
 	if (flip)
 	{
 		V_DrawPatchFlipped(160, 170, 0, patch);
@@ -672,30 +673,32 @@ void F_CastDrawer(void)
 //
 // F_DrawPatchCol
 //
-void F_DrawPatchCol(int x, patch_t *patch, int col)
+// void F_DrawPatchCol(const int x, const patch_t *patch, const int col)
+void F_DrawPatchCol(const int x, const patch_t *patch, const int col)
 {
-	column_t *column;
-	byte *source;
-	byte *dest;
-	byte *desttop;
-	int count;
+	const column_t *column;
+	const char *source;
+	char *dest;
+	char *desttop;
+	// int count;
 
-	column = (column_t *)((byte *)patch + LONG(patch->columnofs[col]));
+	column = reinterpret_cast<const column_t *>(reinterpret_cast<const byte *>(patch) + LONG(patch->columnofs[col]));
 	desttop = screens[0] + x;
 
 	// step through the posts in a column
 	while (column->topdelta != 0xff)
 	{
-		source = (byte *)column + 3;
+		source = reinterpret_cast<const char *>(column + 3);
 		dest = desttop + column->topdelta * SCREENWIDTH;
-		count = column->length;
+		int count = column->length;
 
 		while (count--)
 		{
 			*dest = *source++;
 			dest += SCREENWIDTH;
 		}
-		column = (column_t *)((byte *)column + column->length + 4);
+		// column = static_cast<column_t *>((byte *)column + column->length + 4);
+		column = reinterpret_cast<const column_t *>(reinterpret_cast<const byte *>(column) + column->length + 4);
 	}
 }
 
@@ -704,20 +707,20 @@ void F_DrawPatchCol(int x, patch_t *patch, int col)
 //
 void F_BunnyScroll(void)
 {
-	int scrolled;
-	int x;
-	patch_t *p1;
-	patch_t *p2;
+	// int scrolled;
+	// int x;
+	const patch_t *p1;
+	const patch_t *p2;
 	char name[10];
-	int stage;
+	// int stage;
 	static int laststage;
 
-	p1 = (patch_t *)W_CacheLumpName("PFUB2", PU_LEVEL);
-	p2 = (patch_t *)W_CacheLumpName("PFUB1", PU_LEVEL);
+	p1 = static_cast<patch_t *>(W_CacheLumpName("PFUB2", PU_LEVEL));
+	p2 = static_cast<patch_t *>(W_CacheLumpName("PFUB1", PU_LEVEL));
 
 	V_MarkRect(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
-	scrolled = 320 - (finalecount - 230) / 2;
+	int scrolled = 320 - (finalecount - 230) / 2;
 	if (scrolled > 320)
 	{
 		scrolled = 320;
@@ -727,7 +730,7 @@ void F_BunnyScroll(void)
 		scrolled = 0;
 	}
 
-	for (x = 0; x < SCREENWIDTH; x++)
+	for (int x = 0; x < SCREENWIDTH; x++)
 	{
 		if (x + scrolled < 320)
 		{
@@ -740,19 +743,22 @@ void F_BunnyScroll(void)
 	}
 
 	if (finalecount < 1130)
+	{
 		return;
+	}
 	if (finalecount < 1180)
 	{
-		V_DrawPatch((SCREENWIDTH - 13 * 8) / 2, (SCREENHEIGHT - 8 * 8) / 2, 0, (patch_t *)W_CacheLumpName("END0", PU_CACHE));
+		V_DrawPatch((SCREENWIDTH - 13 * 8) / 2, (SCREENHEIGHT - 8 * 8) / 2, 0, static_cast<patch_t *>(W_CacheLumpName("END0", PU_CACHE)));
 		laststage = 0;
 		return;
 	}
 
-	stage = (finalecount - 1180) / 5;
-	if (stage > 6)
-	{
-		stage = 6;
-	}
+	// const int stage = (finalecount - 1180) / 5;
+	// if (stage > 6)
+	// {
+	// 	stage = 6;
+	// }
+	const int stage = std::max(6, (finalecount - 1180) / 5);
 	if (stage > laststage)
 	{
 		S_StartSound(NULL, sfx_pistol);
@@ -760,7 +766,7 @@ void F_BunnyScroll(void)
 	}
 
 	sprintf(name, "END%i", stage);
-	V_DrawPatch((SCREENWIDTH - 13 * 8) / 2, (SCREENHEIGHT - 8 * 8) / 2, 0, (patch_t *)W_CacheLumpName(name, PU_CACHE));
+	V_DrawPatch((SCREENWIDTH - 13 * 8) / 2, (SCREENHEIGHT - 8 * 8) / 2, 0, static_cast<patch_t *>(W_CacheLumpName(name, PU_CACHE)));
 }
 
 //
@@ -785,21 +791,21 @@ void F_Drawer(void)
 		case 1:
 			if (gamemode == retail)
 			{
-				V_DrawPatch(0, 0, 0, (patch_t *)W_CacheLumpName("CREDIT", PU_CACHE));
+				V_DrawPatch(0, 0, 0, static_cast<patch_t *>(W_CacheLumpName("CREDIT", PU_CACHE)));
 			}
 			else
 			{
-				V_DrawPatch(0, 0, 0, (patch_t *)W_CacheLumpName("HELP2", PU_CACHE));
+				V_DrawPatch(0, 0, 0, static_cast<patch_t *>(W_CacheLumpName("HELP2", PU_CACHE)));
 			}
 			break;
 		case 2:
-			V_DrawPatch(0, 0, 0, (patch_t *)W_CacheLumpName("VICTORY2", PU_CACHE));
+			V_DrawPatch(0, 0, 0, static_cast<patch_t *>(W_CacheLumpName("VICTORY2", PU_CACHE)));
 			break;
 		case 3:
 			F_BunnyScroll();
 			break;
 		case 4:
-			V_DrawPatch(0, 0, 0, (patch_t *)W_CacheLumpName("ENDPIC", PU_CACHE));
+			V_DrawPatch(0, 0, 0, static_cast<patch_t *>(W_CacheLumpName("ENDPIC", PU_CACHE)));
 			break;
 		}
 	}

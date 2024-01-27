@@ -43,7 +43,7 @@ static const char rcsid[] = "$Id: z_zone.c,v 1.4 1997/02/03 16:47:58 b1 Exp $";
 typedef struct
 {
     // total bytes malloced, including header
-    int size;
+    size_t size;
 
     // start / end cap for linked list
     memblock_t blocklist;
@@ -82,7 +82,7 @@ void Z_ClearZone(memzone_t *zone)
 void Z_Init(void)
 {
     memblock_t *block;
-    int size;
+    size_t size;
 
     mainzone = (memzone_t *)I_ZoneBase(&size);
     mainzone->size = size;
